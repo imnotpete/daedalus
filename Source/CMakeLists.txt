@@ -88,8 +88,9 @@ project (DaedalusX64)
 				set (POSIX_DYNAREC SysPosix/DynaRec/CodeBufferManagerPosix.cpp)
 				set (POSIX_HLEGRAPHICS SysPosix/HLEGraphics/DisplayListDebugger.cpp)
 				set (POSIX_MAIN_FILES SysPosix/main.cpp)
+				set (POSIX_UI_FILES SysPosix/UI/AboutComponent.cpp SysPosix/UI/AdjustDeadzoneScreen.cpp SysPosix/UI/AdvancedOptionsScreen.cpp SysPosix/UI/CheatOptionsScreen.cpp SysPosix/UI/ColourPulser.cpp SysPosix/UI/Dialogs.cpp SysPosix/UI/GlobalSettingsComponent.cpp SysPosix/UI/MainMenuScreen.cpp SysPosix/UI/PauseOptionsComponent.cpp SysPosix/UI/PauseScreen.cpp SysPosix/UI/RomPreferencesScreen.cpp SysPosix/UI/RomSelectorComponent.cpp SysPosix/UI/SavestateSelectorComponent.cpp SysPosix/UI/SelectedRomComponent.cpp SysPosix/UI/SplashScreen.cpp SysPosix/UI/UICommand.cpp SysPosix/UI/UIComponent.cpp SysPosix/UI/UIContext.cpp SysPosix/UI/UIElement.cpp SysPosix/UI/UIScreen.cpp SysPosix/UI/UISetting.cpp)
 				set (POSIX_UTILITY SysPosix/Utility/CondPosix.cpp SysPosix/Utility/IOPosix.cpp SysPosix/Utility/ThreadPosix.cpp SysPosix/Utility/TimingPosix.cpp)
-				set (POSIX_BUILD ${POSIX_DEBUG} ${POSIX_DYNAREC} ${POSIX_HLEGRAPHICS} ${POSIX_UTILITY})
+				set (POSIX_BUILD ${POSIX_DEBUG} ${POSIX_DYNAREC} ${POSIX_HLEGRAPHICS} ${POSIX_UI_FILES} ${POSIX_UTILITY})
 
 				# These will remain separate for now..
 				set (LINUX_AUDIO SysPosix/HLEAudio/AudioPluginLinux.cpp)

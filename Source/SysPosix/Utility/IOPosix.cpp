@@ -54,6 +54,8 @@ namespace IO
 				return false;
 			}
 		}
+
+
 	}
 	namespace Directory
 	{
@@ -227,4 +229,6 @@ namespace IO
 
 		return closedir( static_cast< DIR * >( handle ) ) >= 0;
 	}
+
+	
 }

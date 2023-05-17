@@ -23,6 +23,15 @@
     fprintf(stderr, "%s\n" , msg);
 #define DESKTOP 1
 #endif
+#if defined(__linux__)
+#include <GLFW/galo.h>
+#include <GLFW/glfw3.h>
+#define memalign(a, b) malloc(b)
+#define INFO(msg) \
+    fprintf(stderr, "info: %s:%d: ", __FILE__, __LINE__); \
+    fprintf(stderr, "%s\n" , msg);
+#define DESKTOP 1
+#endif
 #if defined(_PSP)
 #include <pspkernel.h>
 #include <pspgu.h>

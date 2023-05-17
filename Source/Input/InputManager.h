@@ -19,6 +19,14 @@ class CInputManager : public CSingleton< CInputManager >
 
 		virtual u32				GetConfigurationFromName( const char * name ) const = 0;
 #endif
+#ifdef DAEDALUS_POSIX
+		virtual u32				GetNumConfigurations() const = 0;
+		virtual const char *	GetConfigurationName( u32 configuration_idx ) const = 0;
+		virtual const char *	GetConfigurationDescription( u32 configuration_idx ) const = 0;
+		virtual void			SetConfiguration( u32 configuration_idx ) = 0;
+
+		virtual u32				GetConfigurationFromName( const char * name ) const = 0;
+#endif
 		virtual bool Initialise() = 0;
 		virtual void Finalise() = 0;
 

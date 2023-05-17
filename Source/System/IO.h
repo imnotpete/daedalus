@@ -39,6 +39,7 @@ namespace IO
 		int			Stat( const char *p_file, SceIoStat *stat );
 #endif
 
+
 	}
 	namespace Directory
 	{
