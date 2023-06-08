@@ -15,6 +15,6 @@ add_library(imgui OBJECT
             ${PROJECT_SOURCE_DIR}/Source/third_party/imgui/imgui_draw.cpp 
             ${PROJECT_SOURCE_DIR}/Source/third_party/imgui/imgui_tables.cpp
             ${PROJECT_SOURCE_DIR}/Source/third_party/imgui/imgui_widgets.cpp 
-            ${PROJECT_SOURCE_DIR}/Source/third_party/imgui/backends/imgui_impl_sdl.cpp 
+            ${PROJECT_SOURCE_DIR}/Source/third_party/imgui/backends/imgui_impl_sdl2.cpp 
             ${BACKEND}
             )       
