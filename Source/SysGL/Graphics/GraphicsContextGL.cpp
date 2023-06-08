@@ -9,16 +9,8 @@
 #include "Graphics/GraphicsContext.h"
 
 #include "Graphics/ColourValue.h"
-#include "third_party/imgui/imgui.h"
-#include "third_party/imgui/backends/imgui_impl_sdl.h"
-#include "third_party/imgui/backends/imgui_impl_opengl3.h"
 
 
-
-static u32 SCR_WIDTH = 640;
-static u32 SCR_HEIGHT = 480;
-
-SDL_Window * gWindow = nullptr;
 
 class GraphicsContextGL : public CGraphicsContext
 {
@@ -57,9 +49,6 @@ template<> bool CSingleton< CGraphicsContext >::Create()
 
 GraphicsContextGL::~GraphicsContextGL()
 {
-	SDL_DestroyWindow(gWindow);
-	gWindow = NULL;
-	SDL_Quit();
 }
 
 static void error_callback(int error, const char* description)
@@ -70,78 +59,13 @@ static void error_callback(int error, const char* description)
 extern bool initgl();
 bool GraphicsContextGL::Initialise()
 {
-
-	//Initialize SDL
-	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
-	{
-		printf( "SDL could not initialize! SDL Error: %s\n", SDL_GetError() );
-		return false;
-	}
-
-    // Decide GL+GLSL versions
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-    // GL ES 2.0 + GLSL 100
-    const char* glsl_version = "#version 100";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#elif defined(__APPLE__)
-    // GL 3.2 Core + GLSL 150
-    const char* glsl_version = "#version 150";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#else
-    // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#endif
-	// SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
-	// SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 );
-	// SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-	//Create window
-	gWindow = SDL_CreateWindow( "Daedalus", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCR_WIDTH, SCR_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
-
-	//Create context
-	SDL_GLContext gContext = SDL_GL_CreateContext( gWindow );
-
-	SDL_GL_MakeCurrent(gWindow, gContext);
-
-	SDL_GL_SetSwapInterval(1);
-
-	 // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplSDL2_InitForOpenGL(gWindow, gContext);
-    ImGui_ImplOpenGL3_Init(glsl_version);
-
-
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-
+	// SDL_Window *gWindow;
 
 	GLenum err = glewInit();
 	if (err != GLEW_OK || !GLEW_VERSION_3_2)
 	{
-		SDL_DestroyWindow(gWindow);
-		gWindow = NULL;
+		// SDL_DestroyWindow(gWindow);
+		// gWindow = NULL;
 		//SDL_Quit();
 		return false;
 	}
@@ -155,7 +79,7 @@ bool GraphicsContextGL::Initialise()
 void GraphicsContextGL::GetScreenSize(u32 * width, u32 * height) const
 {
 	int window_width, window_height;
-	SDL_GL_GetDrawableSize(gWindow, &window_width, &window_height);
+	// SDL_GL_GetDrawableSize(gWindow, &window_width, &window_height);
 
 	*width  = window_width;
 	*height = window_height;
@@ -222,7 +146,7 @@ void GraphicsContextGL::EndFrame()
 
 void GraphicsContextGL::UpdateFrame( bool wait_for_vbl )
 {
-	SDL_GL_SwapWindow(gWindow);
+	// SDL_GL_SwapWindow(gWindow);
 
 //	if( gCleanSceneEnabled ) //TODO: This should be optional
 //	{

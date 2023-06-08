@@ -260,8 +260,6 @@ void IInputManager::GetState( OSContPad pPad[4] )
 		pPad[cont].stick_y = 0;
 	}
 
-	if(SDL_Window* window = gWindow)
-	{
 		const u8* keys = SDL_GetKeyboardState( NULL );
 
 		if (keys [ SDL_SCANCODE_UP ] ) {pPad[0].stick_y = +80;}
@@ -287,7 +285,6 @@ void IInputManager::GetState( OSContPad pPad[4] )
 		if (keys [ SDL_SCANCODE_END ] ){  pPad[0].button |= D_CBUTTONS;}
 		if (keys [ SDL_SCANCODE_DELETE ] ){  pPad[0].button |= L_CBUTTONS;}
 		if (keys [ SDL_SCANCODE_PAGEDOWN ] ){  pPad[0].button |= R_CBUTTONS;}
-	}
 
 #ifdef DAEDALUS_WIN32
 	if (Player1->IsConnected())

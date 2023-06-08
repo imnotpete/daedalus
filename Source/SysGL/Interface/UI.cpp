@@ -15,8 +15,8 @@
 #include "System/IO.h"
 #include "System/Thread.h"
 
+// SDL_Window *gWindow;
 
-#include "third_party/imgui/backends/imgui_impl_sdl.h"
 
 // TODO: Implemenent fullscreen toggle and window resize
 static bool toggle_fullscreen = false;
@@ -55,7 +55,7 @@ static void PollKeyboard(void * arg)
 	SDL_Event event;
 	while (SDL_PollEvent( &event) != 0)
 	{
-		 ImGui_ImplSDL2_ProcessEvent(&event);
+		//  ImGui_ImplSDL2_ProcessEvent(&event);
 		if (event.type == SDL_QUIT)
 		{
 			CPU_Halt("Window Closed");	// SDL window was closed
@@ -70,12 +70,12 @@ static void PollKeyboard(void * arg)
 			if (event.key.keysym.scancode == SDL_SCANCODE_F11)
 			{
 				if (toggle_fullscreen == false) {
-					SDL_SetWindowFullscreen(gWindow, SDL_TRUE);
+					// SDL_SetWindowFullscreen(gWindow, SDL_TRUE);
 					toggle_fullscreen = true;
 				}
 				else
 				{
-					SDL_SetWindowFullscreen(gWindow, SDL_FALSE);
+					// SDL_SetWindowFullscreen(gWindow, SDL_FALSE);
 					toggle_fullscreen = false;
 				}
 			}
@@ -111,7 +111,7 @@ static void PollKeyboard(void * arg)
 
 bool UI_Init()
 {
-	DAEDALUS_ASSERT(gWindow != nullptr, "The SDL window should already have been initialised");
+	// DAEDALUS_ASSERT(gWindow != nullptr, "The SDL window should already have been initialised");
 
 	CPU_RegisterVblCallback(&PollKeyboard, nullptr);
 	return true;

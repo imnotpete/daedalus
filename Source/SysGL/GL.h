@@ -7,8 +7,6 @@
 
 #include "Base/Types.h"
 
-extern SDL_Window * gWindow;
-
 // FIXME: burn all of this with fire.
 
 void sceGuFog(float mn, float mx, u32 col);
