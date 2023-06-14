@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/IO.h"
 #include "Config/ConfigOptions.h"
 #include "SysGL/GL.h"
+#include "UI/MainMenu.h"
 
 #include <SDL2/SDL.h>
 #include "third_party/imgui/imgui.h"
@@ -37,123 +38,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <vector>
 #include <filesystem>
 #include <iostream>
-#include <algorithm>
+
 
 #ifdef DAEDALUS_LINUX
 #include <linux/limits.h>
 #endif
 
 	bool done = false;
-	bool ShowFPSonmenu = false;
-	bool toggle_fullscreen = false;
 
-
-void MainMenu()
-{
-std::filesystem::path RomDir = "Roms";
-std::vector<std::filesystem::path> RomList;
-for (const auto& dir_entry : std::filesystem::directory_iterator{RomDir})
-{
-    RomList.push_back(dir_entry);
-}
-std::sort(RomList);
-std::vector<std::string> RomLabels;
-RomLabels.reserve(RomList.size());
-for (const auto& rom : RomList)
-{
-    RomLabels.push_back(rom.string());
-}
-
-std::vector<const char*> RomLabelsCStr;
-RomLabelsCStr.reserve(RomLabels.size());
-for (const auto& label : RomLabels)
-{
-    RomLabelsCStr.push_back(label.c_str());
-}
-
-ImGui::Begin("Roms");
-static int item_current = 1;
-if (ImGui::ListBox("Roms", &item_current, RomLabelsCStr.data(), static_cast<int>(RomLabelsCStr.size()), -1))
-{
-    // Handle the selected item
-}
-ImGui::SameLine();
-ImGui::End();
-	extern EAudioPluginMode gAudioPluginEnabled;
-	if (ImGui::BeginMainMenuBar())
-	{
-			if (ImGui::BeginMenu("Menu"))
-	    	{
-	        if (ImGui::MenuItem("Settings"))   {
-					}
-
-	        ImGui::EndMenu();
-	    }
-
-			if (ImGui::BeginMenu("Debug"))
-				{
-					// if (ImGui::MenuItem("Show FPS"))   {
-					// 	if(ShowFPSonmenu == false) {ShowFPSonmenu = true;}
-					// 	else if(ShowFPSonmenu == true) {ShowFPSonmenu = false;}
-					// }
-
-					ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Video Mode"))
-				{
-					if (ImGui::MenuItem("Fullscreen"))   {
-						if (toggle_fullscreen == false) {
-							// SDL_SetWindowFullscreen(gWindow, SDL_TRUE);
-							toggle_fullscreen = true;
-						}
-						else if (toggle_fullscreen == true) {
-							// SDL_SetWindowFullscreen(gWindow, SDL_FALSE);
-							toggle_fullscreen = false;
-						}
-					}
-
-					ImGui::EndMenu();
-			}
-
-
-			if (ImGui::BeginMenu("Audio mode")) {
-
-				if (ImGui::MenuItem("Disabled")) {
-					 gAudioPluginEnabled = APM_DISABLED;
-				}
-
-				if (ImGui::MenuItem("Enabled Async")) {
-					 gAudioPluginEnabled = APM_ENABLED_ASYNC;
-				}
-
-				if (ImGui::MenuItem("Enabled Sync")) {
-					gAudioPluginEnabled = APM_ENABLED_SYNC;
-				}
-
-				ImGui::EndMenu();
-
-			 }
-
-	
-			// if(ShowFPSonmenu == true){
-			// // ImGui::Text("Current FPS %#.1f", gCurrentFramerate);
-			// }
-
-			ImGui::EndMainMenuBar();
-
-			
-	}
-
-
-}
 
 
 int main(int argc, char **argv)
 {
-	static u32 SCR_WIDTH = 640;
-static u32 SCR_HEIGHT = 480;
 
+static u32 SCR_WIDTH = 640;
+static u32 SCR_HEIGHT = 480;
+	// Really should be initialised in another file
 	//Initialize SDL
 	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
 	{
@@ -224,22 +124,25 @@ static u32 SCR_HEIGHT = 480;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(gWindow))
                 done = true;
         }
+	// Portability, need to pull in the correct IMPL for the platform
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+	MainMenu();
 
-ImGui_ImplOpenGL3_NewFrame();
-ImGui_ImplSDL2_NewFrame();
-ImGui::NewFrame();
-MainMenu();
+	ImGui::Render();
+	// This needs to be done a portable way 
+	// Required otherwise drawing not possible
 
-ImGui::Render();
-        glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
- SDL_GL_SwapWindow(gWindow);
+    glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+    glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	SDL_GL_SwapWindow(gWindow);
 	}
 }
-// ImGui::EndFrame();
-// 	}
+
 // 	int result = 0;
 
 	
@@ -249,7 +152,7 @@ ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 // 		return 1;
 // 	}
 
-
+// Probably should put all the argc stuff in another fole
 // 	if (argc > 1)
 // 	{
 // 		bool 			batch_test = false;
@@ -313,12 +216,9 @@ ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 //FIXME: All this stuff needs tidying
 
-void Dynarec_ClearedCPUStuffToDo()
-{}
+void Dynarec_ClearedCPUStuffToDo() {}
 
-void Dynarec_SetCPUStuffToDo()
-{
-}
+void Dynarec_SetCPUStuffToDo() {}
 
 
 extern "C" {
