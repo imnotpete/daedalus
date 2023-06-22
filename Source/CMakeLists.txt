@@ -40,7 +40,11 @@ list(APPEND plat_main )
 		option(DAEDALUS_ENABLE_DYNAREC "Enable Dynarec" ON)
 		set(DYNAREC DynaRec) #Enable Dynarec Linker Flag
 	elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86")
-		option(DAEDALUS_ENABLE_DYNAREC "Enable Dynarec" OFF)
+	set(DYNAREC DynaRec) #Enable Dynarec Linker Flag
+		option(DAEDALUS_ENABLE_DYNAREC "Enable Dynarec" ON)
+		elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
+			option(DAEDALUS_ENABLE_DYNAREC "Enable Dynarec" ON)
+			set(DYNAREC DynaRec) #Enable Dynarec Linker Flag
 		## X86 Dynarec Code needs to be moved from W32 emulator
 	elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
 		option(DAEDALUS_ENABLE_DYNAREC "Enable Dynarec" ON)
@@ -204,6 +208,7 @@ if(WIN32)
 
 	if(UNIX)
 		add_subdirectory(SysPosix)
+		add_subdirectory(DynaRec/x86)
 		add_subdirectory(SysGL)
 		add_subdirectory(third_party/imgui)
 	elseif(WIN32) ## Probably keep this generic as we'll build this on Linux too?

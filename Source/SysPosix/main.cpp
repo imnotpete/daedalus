@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 }
 
 //FIXME: All this stuff needs tidying
-
+#ifndef DAEDALUS_ENABLE_DYNAREC
 void Dynarec_ClearedCPUStuffToDo()
 {}
 
@@ -176,3 +176,4 @@ void _EnterDynaRec()
 	DAEDALUS_ASSERT(false, "Unimplemented");
 }
 }
+#endif

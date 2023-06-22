@@ -22,8 +22,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Debug/DBGConsole.h"
 #include "DynaRec/CodeBufferManager.h"
-#include "DyanRec/x86/CodeGeneratorX86.h"
+#include "DynaRec/x86/CodeGeneratorX86.h"
 
+
+#ifdef WIN32
+#else
+#include <sys/mman.h> // For mmap and munmap
+#endif
 /* Added by Lkb (24/8/2001)
 The second buffer is used to hold conditionally executed code pieces that will usually not be executed
 
@@ -56,10 +61,10 @@ class CCodeBufferManagerX86 : public CCodeBufferManager
 {
 public:
 	CCodeBufferManagerX86()
-		:	mpBuffer( NULL )
+		:	mpBuffer( nullptr )
 		,	mBufferPtr( 0 )
 		,	mBufferSize( 0 )
-		,	mpSecondBuffer( NULL )
+		,	mpSecondBuffer( nullptr )
 		,	mSecondBufferPtr( 0 )
 		,	mSecondBufferSize( 0 )
 	{
@@ -82,22 +87,15 @@ private:
 	u32						mSecondBufferPtr;
 	u32						mSecondBufferSize;
 
-private:
 	CAssemblyBuffer			mPrimaryBuffer;
 	CAssemblyBuffer			mSecondaryBuffer;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
-CCodeBufferManager *	CCodeBufferManager::Create()
+std::shared_ptr<CCodeBufferManager> CCodeBufferManager::Create()
 {
-	return new CCodeBufferManagerX86;
+	return  std::make_shared<CCodeBufferManagerX86>();
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 bool	CCodeBufferManagerX86::Initialise()
 {
 	// Reserve a huge range of memory. We do this because we can't simply
@@ -105,7 +103,12 @@ bool	CCodeBufferManagerX86::Initialise()
 	// mess up all the existing function pointers and jumps etc).
 	// Note that this call does not actually allocate any storage - we're not
 	// actually asking Windows to allocate 256Mb!
+	#ifdef WIN32
 	mpBuffer = (u8*)VirtualAlloc(NULL, 256 * 1024 * 1024, MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+	#else
+	mpBuffer = reinterpret_cast<u8*>(mmap(nullptr, 256 * 1024 * 1024, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0));
+
+	#endif
 	if (mpBuffer == NULL)
 		return false;
 
@@ -119,45 +122,40 @@ bool	CCodeBufferManagerX86::Initialise()
 	return true;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void	CCodeBufferManagerX86::Reset()
 {
 	mBufferPtr = 0;
 	mSecondBufferPtr = 0;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void	CCodeBufferManagerX86::Finalise()
 {
 	if (mpBuffer != NULL)
 	{
-		// Decommit all the pages first
-		VirtualFree(mpBuffer, 256 * 1024 * 1024, MEM_DECOMMIT);
-		// Now release
-		VirtualFree(mpBuffer, 0, MEM_RELEASE);
+#ifdef WIN32
+        // Decommit all the pages first
+        VirtualFree(mpBuffer, 256 * 1024 * 1024, MEM_DECOMMIT);
+        // Now release
+        VirtualFree(mpBuffer, 0, MEM_RELEASE);
+#else
+        munmap(mpBuffer,mBufferSize);
+#endif
 		mpBuffer = NULL;
 	}
 
 	mpSecondBuffer = NULL;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 std::shared_ptr<CCodeGenerator> CCodeBufferManagerX86::StartNewBlock()
 {
 	// Round up to 16 byte boundry
 	u32 aligned_ptr( (mBufferPtr + 15) & (~15) );
 
-	u32	padding( aligned_ptr - mBufferPtr );
-	if( padding > 0 )
-	{
-		memset( mpBuffer + mBufferPtr, 0xcc, padding );		// 0xcc is 'int 3'
-	}
+	// u32	padding( aligned_ptr - mBufferPtr );
+	// if( padding > 0 )
+	// {
+	// 	memset( mpBuffer + mBufferPtr, 0xcc, padding );		// 0xcc is 'int 3'
+	// }
 
 	mBufferPtr = aligned_ptr;
 
@@ -167,10 +165,15 @@ std::shared_ptr<CCodeGenerator> CCodeBufferManagerX86::StartNewBlock()
 	if (mBufferPtr + 32768 > mBufferSize)
 	{
 		// Increase by 1MB
-		LPVOID pNewAddress;
+		void* pNewAddress;
 
 		mBufferSize += 1024 * 1024;
-		pNewAddress = VirtualAlloc(mpBuffer, mBufferSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+		#ifdef WIN32
+    pNewAddress = VirtualAlloc(mpBuffer, mBufferSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+#else
+pNewAddress = mmap(nullptr, mBufferSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+#endif
 		if (pNewAddress == 0)
 		{
 			DBGConsole_Msg(0, "SR Buffer allocation failed"); // maybe this should be an abort?
@@ -185,10 +188,15 @@ std::shared_ptr<CCodeGenerator> CCodeBufferManagerX86::StartNewBlock()
 	if (mSecondBufferPtr + 32768 > mSecondBufferSize)
 	{
 		// Increase by 1MB
-		LPVOID pNewAddress;
+		void* pNewAddress;
 
 		mSecondBufferSize += 1024 * 1024;
-		pNewAddress = VirtualAlloc(mpSecondBuffer, mSecondBufferSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	#ifdef WIN32
+	pNewAddress = VirtualAlloc(mpSecondBuffer, mSecondBufferSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	#else
+	pNewAddress = mmap(nullptr, mSecondBufferSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0);
+	#endif
+
 		if (pNewAddress == 0)
 		{
 			DBGConsole_Msg(0, "SR Second Buffer allocation failed"); // maybe this should be an abort?
@@ -203,12 +211,9 @@ std::shared_ptr<CCodeGenerator> CCodeBufferManagerX86::StartNewBlock()
 	mPrimaryBuffer.SetBuffer( mpBuffer + mBufferPtr );
 	mSecondaryBuffer.SetBuffer( mpSecondBuffer + mSecondBufferPtr );
 
-	return new CCodeGeneratorX86( &mPrimaryBuffer, &mSecondaryBuffer );
+	return std::make_shared<CCodeGeneratorX86>( &mPrimaryBuffer, &mSecondaryBuffer );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 u32 CCodeBufferManagerX86::FinaliseCurrentBlock()
 {
 	u32		main_block_size( mPrimaryBuffer.GetSize() );
@@ -216,7 +221,7 @@ u32 CCodeBufferManagerX86::FinaliseCurrentBlock()
 	mBufferPtr += main_block_size;
 
 	mSecondBufferPtr += mSecondaryBuffer.GetSize();
-	mSecondBufferPtr = ((mSecondBufferPtr - 1) & 0xfffffff0) + 0x10; // align to 16-byte boundary
-
+	// mSecondBufferPtr = ((mSecondBufferPtr - 1) & 0xfffffff0) + 0x10; // align to 16-byte boundary
+mSecondBufferPtr = (mSecondBufferPtr + 15) & (~15);
 	return main_block_size;
 }

@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "DynaRec/Trace.h"
 #include "Ultra/ultra_R4300.h"
 
-#include "DyanRec/x86/CodeGeneratorX86.h"
+#include "DynaRec/x86/CodeGeneratorX86.h"
 
 using namespace AssemblyUtils;
 
@@ -278,8 +278,7 @@ CJumpLocation CCodeGeneratorX86::GenerateExitCode( u32 exit_address, u32 jump_ad
 #endif
 
 	MOVI(ECX_CODE, num_instructions);
-	CALL( CCodeLabel( CPU_UpdateCounter ) );
-
+CALL( CCodeLabel( reinterpret_cast<const void*>(CPU_UpdateCounter) ) );
 	// This jump may be NULL, in which case we patch it below
 	// This gets patched with a jump to the next fragment if the target is later found
 	CJumpLocation jump_to_next_fragment( GenerateBranchIfNotSet( const_cast< u32 * >( &gCPUState.StuffToDo ), next_fragment ) );
@@ -320,7 +319,7 @@ CJumpLocation CCodeGeneratorX86::GenerateExitCode( u32 exit_address, u32 jump_ad
 void CCodeGeneratorX86::GenerateEretExitCode( u32 num_instructions, CIndirectExitMap * p_map )
 {
 	MOVI(ECX_CODE, num_instructions);
-	CALL( CCodeLabel( CPU_UpdateCounter ) );
+CALL( CCodeLabel( reinterpret_cast<const void*>(CPU_UpdateCounter) ) );
 
 	// We always exit to the interpreter, regardless of the state of gCPUState.StuffToDo
 
@@ -341,7 +340,7 @@ void CCodeGeneratorX86::GenerateEretExitCode( u32 num_instructions, CIndirectExi
 void CCodeGeneratorX86::GenerateIndirectExitCode( u32 num_instructions, CIndirectExitMap * p_map )
 {
 	MOVI(ECX_CODE, num_instructions);
-	CALL( CCodeLabel( CPU_UpdateCounter ) );
+	CALL( CCodeLabel( reinterpret_cast<const void*>(CPU_UpdateCounter) ) );
 
 	CCodeLabel		no_target( NULL );
 	CJumpLocation	jump_to_next_fragment( GenerateBranchIfNotSet( const_cast< u32 * >( &gCPUState.StuffToDo ), no_target ) );
@@ -359,9 +358,9 @@ void CCodeGeneratorX86::GenerateIndirectExitCode( u32 num_instructions, CIndirec
 	// gCPUState.StuffToDo == 0, try to jump to the indirect target
 	PatchJumpLong( jump_to_next_fragment, GetAssemblyBuffer()->GetLabel() );
 
-	MOVI( ECX_CODE, reinterpret_cast< u32 >( p_map ) );
+	MOVI( ECX_CODE, reinterpret_cast< uintptr_t >( p_map ) );
 	MOV_REG_MEM( EDX_CODE, &gCPUState.TargetPC );
-	CALL( CCodeLabel( IndirectExitMap_Lookup ) );
+	CALL( CCodeLabel( reinterpret_cast<const void*>(IndirectExitMap_Lookup ) ));
 
 	// If the target was not found, exit
 	TEST( EAX_CODE, EAX_CODE );
@@ -377,7 +376,7 @@ void CCodeGeneratorX86::GenerateExceptionHander( ExceptionHandlerFn p_exception_
 {
 	CCodeLabel exception_handler( GetAssemblyBuffer()->GetLabel() );
 
-	CALL( CCodeLabel( p_exception_handler_fn ) );
+	CALL( CCodeLabel( reinterpret_cast<const void*>(p_exception_handler_fn ) ));
 	RET();
 
 	for( std::vector< CJumpLocation >::const_iterator it = exception_handler_jumps.begin(); it != exception_handler_jumps.end(); ++it )
@@ -639,7 +638,7 @@ void	CCodeGeneratorX86::GenerateGenericR4300( OpCode op_code, CPU_Instruction p_
 
 	// Call function - __fastcall
 	MOVI(ECX_CODE, op_code._u32);
-	CALL( CCodeLabel( p_instruction ) );
+	CALL( CCodeLabel( reinterpret_cast<const void*>(p_instruction )) );
 }
 
 //*****************************************************************************
@@ -714,7 +713,7 @@ bool CCodeGeneratorX86::GenerateLW( EN64Reg rt, EN64Reg base, s16 offset )
 {
 	if (gDynarecStackOptimisation && base == N64Reg_SP)
 	{
-		GenerateLoad((u32)g_pu8RamBase_8000, base, offset, 0, 32);
+		GenerateLoad((uintptr_t)g_pu8RamBase_8000, base, offset, 0, 32);
 
 		MOV_MEM_REG(&gCPUState.CPU[rt]._u32_0, EAX_CODE);
 		CDQ();
@@ -731,7 +730,7 @@ bool CCodeGeneratorX86::GenerateSWC1( u32 ft, EN64Reg base, s16 offset )
 	if (gDynarecStackOptimisation && base == N64Reg_SP)
 	{
 		MOV_REG_MEM(ECX_CODE, &gCPUState.CPU[base]._u32_0);
-		ADDI(ECX_CODE, (u32)g_pu8RamBase_8000);
+		ADDI(ECX_CODE, (uintptr_t)g_pu8RamBase_8000);
 
 		MOV_REG_MEM(EAX_CODE, &gCPUState.FPU[ft]._u32);
 		MOV_MEM_BASE_OFFSET_REG(ECX_CODE, offset, EAX_CODE);
@@ -746,7 +745,7 @@ bool CCodeGeneratorX86::GenerateSW( EN64Reg rt, EN64Reg base, s16 offset )
 	if (gDynarecStackOptimisation && base == N64Reg_SP)
 	{
 		MOV_REG_MEM(ECX_CODE, &gCPUState.CPU[base]._u32_0);
-		ADDI(ECX_CODE, (u32)g_pu8RamBase_8000);
+		ADDI(ECX_CODE, (uintptr_t)g_pu8RamBase_8000);
 		MOV_REG_MEM(EAX_CODE, &gCPUState.CPU[rt]._u32_0);
 		MOV_MEM_BASE_OFFSET_REG(ECX_CODE, offset, EAX_CODE);
 		return true;
@@ -759,7 +758,7 @@ bool CCodeGeneratorX86::GenerateLB( EN64Reg rt, EN64Reg base, s16 offset )
 {
 	if (gDynarecStackOptimisation && base == N64Reg_SP)
 	{
-		GenerateLoad((u32)g_pu8RamBase_8000, base, offset, U8_TWIDDLE, 8);
+		GenerateLoad((uintptr_t)g_pu8RamBase_8000, base, offset, U8_TWIDDLE, 8);
 		MOVSX(EAX_CODE, EAX_CODE, true);
 		MOV_MEM_REG(&gCPUState.CPU[rt]._u32_0, EAX_CODE);
 		CDQ();
@@ -775,7 +774,7 @@ bool CCodeGeneratorX86::GenerateLBU( EN64Reg rt, EN64Reg base, s16 offset )
 {
 	if (gDynarecStackOptimisation && base == N64Reg_SP)
 	{
-		GenerateLoad((u32)g_pu8RamBase_8000, base, offset, U8_TWIDDLE, 8);
+		GenerateLoad((uintptr_t)g_pu8RamBase_8000, base, offset, U8_TWIDDLE, 8);
 		MOVZX(EAX_CODE, EAX_CODE, true);
 		MOV_MEM_REG(&gCPUState.CPU[rt]._u32_0, EAX_CODE);
 		XOR(EDX_CODE, EDX_CODE);
@@ -791,7 +790,7 @@ bool CCodeGeneratorX86::GenerateLH( EN64Reg rt, EN64Reg base, s16 offset )
 {
 	if (gDynarecStackOptimisation && base == N64Reg_SP)
 	{
-		GenerateLoad((u32)g_pu8RamBase_8000, base, offset, U16_TWIDDLE, 16);
+		GenerateLoad((uintptr_t)g_pu8RamBase_8000, base, offset, U16_TWIDDLE, 16);
 
 		MOVSX(EAX_CODE, EAX_CODE, false);
 		MOV_MEM_REG(&gCPUState.CPU[rt]._u32_0, EAX_CODE);
@@ -843,7 +842,7 @@ bool CCodeGeneratorX86::GenerateLWC1( u32 ft, EN64Reg base, s16 offset )
 {
 	if (gDynarecStackOptimisation && base == N64Reg_SP)
 	{
-		GenerateLoad((u32)g_pu8RamBase_8000, base, offset, 0, 32);
+		GenerateLoad((uintptr_t)g_pu8RamBase_8000, base, offset, 0, 32);
 
 		MOV_MEM_REG(&gCPUState.FPU[ft]._u32, EAX_CODE);
 		return true;
