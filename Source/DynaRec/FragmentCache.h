@@ -89,8 +89,9 @@ public:
 
 	u32						GetMemoryUsage() const					{ return mMemoryUsage; }
 
-	std::shared_ptr<CCodeBufferManager>	GetCodeBufferManager() const			{ return mpCodeBufferManager; }
-
+std::unique_ptr<CCodeBufferManager>&& GetCodeBufferManager() {
+    return std::move(mpCodeBufferManager);
+}
 	bool					ShouldInvalidateOnWrite( u32 address, u32 length ) const;
 
 private:
@@ -134,7 +135,7 @@ private:
 	mutable std::array<FHashT, HASH_TABLE_SIZE> mpCacheHashTable;
 	// mutable FHashT			mpCacheHashTable[HASH_TABLE_SIZE];
 
-	std::shared_ptr<CCodeBufferManager>	mpCodeBufferManager;
+	std::unique_ptr<CCodeBufferManager>	mpCodeBufferManager;
 
 	CFragmentCacheCoverage	mCacheCoverage;
 };

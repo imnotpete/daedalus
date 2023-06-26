@@ -73,7 +73,7 @@ namespace
 //*************************************************************************************
 //
 //*************************************************************************************
-CFragment::CFragment( std::shared_ptr<CCodeBufferManager> p_manager,
+CFragment::CFragment( std::unique_ptr<CCodeBufferManager> p_manager,
 					  u32 entry_address,
 					  u32 exit_address,
 					  const TraceBuffer & trace,
@@ -100,14 +100,14 @@ CFragment::CFragment( std::shared_ptr<CCodeBufferManager> p_manager,
 	mRegisterUsage = register_usage;
 #endif
 
-	Assemble( p_manager, exit_address, trace, branch_details, register_usage );
+	Assemble( std::move(p_manager), exit_address, trace, branch_details, register_usage );
 }
 
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
 //*************************************************************************************
 // Create a Fragement for Patch Function
 //*************************************************************************************
-CFragment::CFragment(std::shared_ptr<CCodeBufferManager> p_manager, u32 entry_address,
+CFragment::CFragment(std::unique_ptr<CCodeBufferManager> p_manager, u32 entry_address,
 						u32 function_length, void* function_Ptr)
 	:	mEntryAddress( entry_address )
 	,	mInputLength(function_length  * sizeof( OpCode ) )
@@ -124,7 +124,7 @@ CFragment::CFragment(std::shared_ptr<CCodeBufferManager> p_manager, u32 entry_ad
 	,	mpCache( nullptr )
 #endif
 {
-	Assemble(p_manager, CCodeLabel(function_Ptr));
+	Assemble(std::move(p_manager), CCodeLabel(function_Ptr));
 }
 #endif
 //*************************************************************************************
@@ -566,7 +566,7 @@ void	CFragment::AddPatch( u32 address, CJumpLocation jump_location )
 //*************************************************************************************
 //
 //*************************************************************************************
-void CFragment::Assemble( std::shared_ptr<CCodeBufferManager> p_manager,
+void CFragment::Assemble( std::unique_ptr<CCodeBufferManager> p_manager,
 						  u32 exit_address,
 						  const std::vector< STraceEntry > & trace,
 						  const std::vector< SBranchDetails > & branch_details,
@@ -576,7 +576,7 @@ void CFragment::Assemble( std::shared_ptr<CCodeBufferManager> p_manager,
 
 	const u32				NO_JUMP_ADDRESS( 0 );
 
-	std::shared_ptr<CCodeGenerator>	p_generator = p_manager->StartNewBlock();
+	std::unique_ptr<CCodeGenerator>	p_generator = p_manager->StartNewBlock();
 
 	mEntryPoint = p_generator->GetEntryPoint();
 
@@ -837,12 +837,12 @@ void CFragment::Assemble( std::shared_ptr<CCodeBufferManager> p_manager,
 //*************************************************************************************
 //
 //*************************************************************************************
-void CFragment::Assemble( std::shared_ptr<CCodeBufferManager> p_manager, CCodeLabel function_ptr)
+void CFragment::Assemble( std::unique_ptr<CCodeBufferManager> p_manager, CCodeLabel function_ptr)
 {
 	std::vector< CJumpLocation >		exception_handler_jumps;
 	SRegisterUsageInfo register_usage;
 
-	std::shared_ptr<CCodeGenerator> p_generator = p_manager->StartNewBlock();
+	std::unique_ptr<CCodeGenerator> p_generator = p_manager->StartNewBlock();
 	mEntryPoint = p_generator->GetEntryPoint();
 
 

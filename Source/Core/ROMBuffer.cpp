@@ -69,7 +69,7 @@ namespace
 	}
 
 #ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
-	std::shared_ptr<ROMFile> DecompressRom( std::shared_ptr<ROMFile> p_rom_file, const char * temp_filename, COutputStream & messages )
+	std::unique_ptr<ROMFile> DecompressRom( std::unique_ptr<ROMFile> p_rom_file, const char * temp_filename, COutputStream & messages )
 	{
 		auto p_new_file = nullptr;
 		FILE *		fh( fopen( temp_filename, "wb" ) );
@@ -298,7 +298,7 @@ bool RomBuffer::Open()
 		}
 #endif
 		spRomFileCache = new ROMFileCache();
-		spRomFileCache->Open( p_rom_file );
+		spRomFileCache->Open( std::move(p_rom_file) );
 		sRomFixed = false;
 	}
 

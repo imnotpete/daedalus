@@ -35,11 +35,11 @@ public:
 	virtual void			Reset();
 	virtual void			Finalise();
 
-	virtual std::shared_ptr<CCodeGenerator> StartNewBlock();
+	virtual std::unique_ptr<CCodeGenerator> StartNewBlock();
 	virtual u32				FinaliseCurrentBlock();
 };
 
-std::shared_ptr<CCodeBufferManager> CCodeBufferManager::Create()
+std::unique_ptr<CCodeBufferManager> CCodeBufferManager::Create()
 {
 	return std::make_unique<CCodeBufferManagerOSX>();
 }
@@ -60,7 +60,7 @@ void CCodeBufferManagerOSX::Finalise()
 	DAEDALUS_ASSERT(false, "Unimplemented");
 }
 
-std::shared_ptr<CCodeGenerator> CCodeBufferManagerOSX::StartNewBlock()
+std::unique_ptr<CCodeGenerator> CCodeBufferManagerOSX::StartNewBlock()
 {
 	DAEDALUS_ASSERT(false, "Unimplemented");
 	return nullptr;

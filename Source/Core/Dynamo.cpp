@@ -366,7 +366,7 @@ void	CPU_DumpFragmentCache()
 //*****************************************************************************
 void CPU_CreateAndAddFragment()
 {
-	// std::shared_ptr<CFragment> p_fragment( gTraceRecorder.CreateFragment( gFragmentCache.GetCodeBufferManager() ) );
+
 	CFragment * p_fragment( gTraceRecorder.CreateFragment( gFragmentCache.GetCodeBufferManager() ) );
 
 	if( p_fragment != nullptr )

@@ -65,7 +65,7 @@ template < class T > class CSingleton
 			#ifdef DAEDALUS_ENABLE_ASSERTS
 			DAEDALUS_ASSERT_Q(mpInstance != nullptr);
 			#endif
-			mpInstance = nullptr;
+			mpInstance.reset();
 		}
 
 		inline static bool IsAvailable()
@@ -85,6 +85,6 @@ template < class T > class CSingleton
 		static std::unique_ptr<T> mpInstance;
 };
 
-template < class T > std::unique_ptr<T> CSingleton< T >::mpInstance = NULL;
+template < class T > std::unique_ptr<T> CSingleton< T >::mpInstance = nullptr;
 
 #endif // UTILITY_SINGLETON_H_

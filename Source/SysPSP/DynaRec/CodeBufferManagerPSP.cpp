@@ -114,7 +114,7 @@ public:
 	virtual void				Reset();
 	virtual void				Finalise();
 
-	virtual std::shared_ptr<CCodeGenerator>	StartNewBlock();
+	virtual std::unique_ptr<CCodeGenerator>	StartNewBlock();
 	virtual u32					FinaliseCurrentBlock();
 
 private:
@@ -130,9 +130,9 @@ private:
 
 //
 
-std::shared_ptr<CCodeBufferManager> CCodeBufferManager::Create()
+std::unique_ptr<CCodeBufferManager> CCodeBufferManager::Create()
 {
-	return std::make_shared<CCodeBufferManagerPSP>();
+	return std::make_unique<CCodeBufferManagerPSP>();
 }
 
 
@@ -173,14 +173,14 @@ void	CCodeBufferManagerPSP::Finalise()
 
 //
 
-std::shared_ptr<CCodeGenerator>  CCodeBufferManagerPSP::StartNewBlock()
+std::unique_ptr<CCodeGenerator>  CCodeBufferManagerPSP::StartNewBlock()
 {
 	u8 * primary( mPrimaryBuffer.StartNewBlock() );
 	u8 * secondary( mSecondaryBuffer.StartNewBlock() );
 
 	mAssemblyBufferA.SetBuffer( primary );
 	mAssemblyBufferB.SetBuffer( secondary );
-	return std::make_shared<CCodeGeneratorPSP>( &mAssemblyBufferA, &mAssemblyBufferB );
+	return std::make_unique<CCodeGeneratorPSP>( &mAssemblyBufferA, &mAssemblyBufferB );
 }
 
 
