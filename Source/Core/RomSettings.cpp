@@ -152,7 +152,7 @@ template<> bool	CSingleton< CRomSettingsDB >::Create()
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT_Q(mpInstance == nullptr);
 	#endif
-	mpInstance = std::make_shared<IRomSettingsDB>();
+	 mpInstance = std::make_unique<IRomSettingsDB>();
 
 	 std::filesystem::path p("roms.ini");
 	 const char *ini_filename = p.c_str();

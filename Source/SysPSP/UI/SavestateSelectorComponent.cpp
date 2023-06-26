@@ -230,7 +230,7 @@ void ISavestateSelectorComponent::LoadSlots(){
 		RomID	rom_id( SaveState_GetRomID( filename_ss ) );
 		RomSettings	settings;
 		CUIElement *element;
-		if( !rom_id.Empty() && CRomSettingsDB::Get()->GetSettings( rom_id, &settings ) )
+		if( !rom_id.Empty() && CRomSettingsDB::Get().GetSettings( rom_id, &settings ) )
 		{
 			// IO::File::Stat(filename_ss, &file_stat);
 			sceIoGetstat ( filename_ss, &file_stat );

@@ -35,7 +35,7 @@
 //
 // CMyUniqueClass::Create();
 // ..
-// CMyUniqueClass::Get()->DoSomething();
+// CMyUniqueClass::Get().DoSomething();
 // etc
 // ..
 // CMyUniqueClass::Destroy();
@@ -48,13 +48,13 @@ template < class T > class CSingleton
 		//CSingleton();
 		virtual ~CSingleton() {}
 
-		inline static std::shared_ptr<T> Get()
-		{
-			#ifdef DAEDALUS_ENABLE_ASSERTS
-			DAEDALUS_ASSERT(mpInstance != nullptr, "%s", __PRETTY_FUNCTION__ );
-			#endif
-			return mpInstance;
-		}
+	inline static T& Get()
+{
+    #ifdef DAEDALUS_ENABLE_ASSERTS
+    DAEDALUS_ASSERT(mpInstance != nullptr, "%s", __PRETTY_FUNCTION__ );
+    #endif
+    return *mpInstance;
+}
 
 
 		static bool Create();
@@ -82,9 +82,9 @@ template < class T > class CSingleton
 		}
 
 	protected:
-		static std::shared_ptr<T> mpInstance;
+		static std::unique_ptr<T> mpInstance;
 };
 
-template < class T > std::shared_ptr<T> CSingleton< T >::mpInstance = NULL;
+template < class T > std::unique_ptr<T> CSingleton< T >::mpInstance = NULL;
 
 #endif // UTILITY_SINGLETON_H_

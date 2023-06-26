@@ -62,7 +62,7 @@ template<> bool CSingleton< CROMFileMemory >::Create()
 	DAEDALUS_ASSERT_Q(mpInstance == nullptr);
 	#endif
 
-	mpInstance = std::make_shared<IROMFileMemory>();
+	 mpInstance = std::make_unique<IROMFileMemory>();
 	return mpInstance != NULL;
 }
 

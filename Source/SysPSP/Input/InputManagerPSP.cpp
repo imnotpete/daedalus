@@ -453,7 +453,7 @@ template<> bool CSingleton< CInputManager >::Create()
 {
 	DAEDALUS_ASSERT_Q(mpInstance == NULL);
 
-	mpInstance = std::make_shared<IInputManager>();
+	 mpInstance = std::make_unique<IInputManager>();
 	return mpInstance->Initialise();
 }
 

@@ -165,7 +165,7 @@ static SRomPreferences romPreferences;
 
 void UI::LoadRomPreferences(RomID mRomID)
 {
-	CPreferences::Get()->GetRomPreferences( mRomID, &romPreferences );
+	CPreferences::Get().GetRomPreferences( mRomID, &romPreferences );
 }
 
 bool UI::DrawOptionsPage(RomID mRomID)
@@ -261,8 +261,8 @@ bool UI::DrawOptionsPage(RomID mRomID)
 
 	if( ImGui::Button("Save", ImVec2(144, 30)) )
 	{
-		CPreferences::Get()->SetRomPreferences( mRomID, romPreferences );
-		CPreferences::Get()->Commit();
+		CPreferences::Get().SetRomPreferences( mRomID, romPreferences );
+		CPreferences::Get().Commit();
 	
 		currentPage = 0;
 	}

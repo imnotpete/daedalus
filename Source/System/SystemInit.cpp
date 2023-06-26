@@ -112,8 +112,8 @@ struct SysEntityEntry
 #ifdef DAEDALUS_ENABLE_PROFILING
 static void ProfilerVblCallback(void * arg)
 {
-	CProfiler::Get()->Update();
-	CProfiler::Get()->Display();
+	CProfiler::Get().Update();
+	CProfiler::Get().Display();
 }
 
 static bool Profiler_Init()

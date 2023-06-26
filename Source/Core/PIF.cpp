@@ -244,7 +244,7 @@ template<> bool	CSingleton< CController >::Create()
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT_Q(mpInstance == nullptr);
 	#endif
-	mpInstance = std::make_shared<IController>();
+	 mpInstance = std::make_unique<IController>();
 
 	return true;
 }
@@ -370,7 +370,7 @@ void IController::Process()
 	}
 
 	// Read controller data here (here gets called fewer times than CONT_READ_CONTROLLER)
-	CInputManager::Get()->GetState( mContPads );
+	CInputManager::Get().GetState( mContPads );
 
 	bool stop = false;
 

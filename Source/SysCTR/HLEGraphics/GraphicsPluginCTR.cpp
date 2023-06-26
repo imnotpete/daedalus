@@ -214,7 +214,7 @@ void CGraphicsPluginImpl::UpdateScreen()
 				}
 			}
 
-			CGraphicsContext::Get()->UpdateFrame( false );
+			CGraphicsContext::Get().UpdateFrame( false );
 		}
 
 		static u32 current_frame = 0;

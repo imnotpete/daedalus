@@ -92,7 +92,7 @@ template<> bool	CSingleton< CPreferences >::Create()
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT_Q(mpInstance == nullptr);
 #endif
-	mpInstance = std::make_shared<IPreferences>();
+	 mpInstance = std::make_unique<IPreferences>();
 
 	return true;
 }
@@ -274,7 +274,7 @@ bool IPreferences::OpenPreferencesFile( const std::filesystem::path  &filename )
 #ifdef DAEDALUS_PSP
 		if( section->FindProperty( "Controller", &property ) )
 		{
-			preferences.ControllerIndex = CInputManager::Get()->GetConfigurationFromName( property->GetValue() );
+			preferences.ControllerIndex = CInputManager::Get().GetConfigurationFromName( property->GetValue() );
 		}
 #endif
 		if( section->FindProperty( "MemoryAccessOptimisation", &property ) )
@@ -297,7 +297,7 @@ void IPreferences::OutputSectionDetails( const RomID & id, const SRomPreferences
 {
 	// Generate the CRC-ID for this rom:
 	RomSettings		settings;
-	CRomSettingsDB::Get()->GetSettings( id, &settings );
+	CRomSettingsDB::Get().GetSettings( id, &settings );
 
 	fprintf(fh, "{%08x%08x-%02x}\t// %s\n", id.CRC[0], id.CRC[1], id.CountryID, settings.GameName.c_str() );
 	fprintf(fh, "PatchesEnabled=%d\n",             preferences.PatchesEnabled);
@@ -318,7 +318,7 @@ void IPreferences::OutputSectionDetails( const RomID & id, const SRomPreferences
 	fprintf(fh, "MemoryAccessOptimisation=%d\n",   preferences.MemoryAccessOptimisation);
 	fprintf(fh, "CheatsEnabled=%d\n",              preferences.CheatsEnabled);
 #ifdef DAEDALUS_PSP
-	fprintf(fh, "Controller=%s\n",                CInputManager::Get()->GetConfigurationName( preferences.ControllerIndex ));
+	fprintf(fh, "Controller=%s\n",                CInputManager::Get().GetConfigurationName( preferences.ControllerIndex ));
 #endif
 	fprintf(fh, "\n");			// Spacer
 }
@@ -495,7 +495,7 @@ void SRomPreferences::Apply() const
 //	gAdaptFrequency             = AudioAdaptFrequency;
 	gControllerIndex            = ControllerIndex;							//Used during ROM initialization
 #ifdef DAEDALUS_PSP
-	CInputManager::Get()->SetConfiguration( ControllerIndex );  //Used after initialization
+	CInputManager::Get().SetConfiguration( ControllerIndex );  //Used after initialization
 #endif
 }
 

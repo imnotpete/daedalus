@@ -300,10 +300,10 @@ void	IMainMenuScreen::Run()
 	CUIScreen::Run();
 
 	// switch back to the emulator display
-	CGraphicsContext::Get()->SwitchToChosenDisplay();
+	CGraphicsContext::Get().SwitchToChosenDisplay();
 
 	// Clear everything to black - looks a bit tidier
-	CGraphicsContext::Get()->ClearAllSurfaces();
+	CGraphicsContext::Get().ClearAllSurfaces();
 }
 
 
@@ -379,7 +379,7 @@ void	IMainMenuScreen::OnStartEmulation()
 void DisplayRomsAndChoose(bool show_splash)
 {
 	// switch back to the LCD display
-	CGraphicsContext::Get()->SwitchToLcdDisplay();
+	CGraphicsContext::Get().SwitchToLcdDisplay();
 
 	CDrawText::Initialise();
 
