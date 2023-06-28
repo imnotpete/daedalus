@@ -130,7 +130,7 @@ void DLDebugger_RequestDebug()
 }
 
 
-static void EncodeTexture(const CNativeTexture * texture, DataSink * sink)
+static void EncodeTexture(const std::shared_ptr<CNativeTexture> texture, DataSink * sink)
 {
 	u32 width  = texture->GetWidth();
 	u32 height = texture->GetHeight();

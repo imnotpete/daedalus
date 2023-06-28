@@ -153,7 +153,7 @@ static bool GenerateTexels(void ** p_texels,
 	return false;
 }
 
-static void UpdateTexture( const TextureInfo & ti, CNativeTexture * texture )
+static void UpdateTexture( const TextureInfo & ti, std::shared_ptr<CNativeTexture> texture )
 {
 	#ifdef DAEDALUS_PROFILE
 	DAEDALUS_PROFILE( "Texture Conversion" );
@@ -239,7 +239,7 @@ bool CachedTexture::Initialise()
 	#endif
 	u32 width  = mTextureInfo.GetWidth();
 	u32 height = mTextureInfo.GetHeight();
-	std::default_random_engine FastRando;
+	std::default_random_engine FastRand;
 
 	if (mTextureInfo.GetEmulateMirrorS()) width  *= 2;
 	if (mTextureInfo.GetEmulateMirrorT()) height *= 2;
@@ -253,7 +253,7 @@ bool CachedTexture::Initialise()
 
 		if(gCheckTextureHashFrequency > 0)
 		{
-			mFrameLastUpToDate = gRDPFrame + (FastRando() & (gCheckTextureHashFrequency - 1));
+			mFrameLastUpToDate = gRDPFrame + (FastRand() & (gCheckTextureHashFrequency - 1));
 		}
 		UpdateTextureHash();
 		UpdateTexture( mTextureInfo, mpTexture );
@@ -339,7 +339,7 @@ bool CachedTexture::HasExpired() const
 }
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-void CachedTexture::DumpTexture( const TextureInfo & ti, const CNativeTexture * texture )
+void CachedTexture::DumpTexture( const TextureInfo & ti, const std::shared_ptrstd::shared_ptr<CNativeTexture> texture  )
 {
 	DAEDALUS_ASSERT(texture != nullptr, "Should have a texture");
 
