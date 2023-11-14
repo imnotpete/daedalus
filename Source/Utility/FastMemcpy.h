@@ -2,7 +2,7 @@
 #ifndef UTILITY_FASTMEMCPY_H_
 #define UTILITY_FASTMEMCPY_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 
 //#define PROFILE_MEMCPY
 

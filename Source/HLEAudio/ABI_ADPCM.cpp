@@ -1,7 +1,7 @@
 #include "Base/Types.h"
 
 
-#include <string.h>
+#include <cstring>
 
 #include "Base/MathUtil.h"
 #include "Core/Memory.h"
@@ -117,46 +117,23 @@ void ADPCM2_Decode8(std::array<int, 8> &inp1, std::array<int, 8> &inp2, u32 inPt
     Decode8(inp2, icode_e, icode_f, icode_g, icode_h);
   }
 }
+void ADPCM2_Loop(std::array<s32, 8>& a, std::array<int, 8>& i1, const s16* b1, const s16* b2, s16* out) {
+    const int scl = 2048;
 
-// void ADPCM2_Loop(s32 (&a)[8], int (&i1)[8], const s16 *b1, const s16 *b2,
-//                  s16 *out) {
-//   int l1(a[6]);
-//   int l2(a[7]);
-// void ADPCM2_Loop(s32 (&a)[8], int (&i1)[8], const s16 *b1, const s16 *b2,  s16 *out) {
-void ADPCM2_Loop(std::array<s32, 8> (&a), std::array<int, 8> &i1, const s16 *b1, const s16 *b2, s16 *out) {
+    int l1 = a[6];
+    int l2 = a[7];
 
-  int l1(a[6]);
-  int l2(a[7]);
+    for (size_t j = 0; j < 8; j++) {
+        a[j] = 0; // Initialize to zero before accumulating
 
+        for (size_t k = 0; k <= j; k++) {
+            a[j] += static_cast<int>(b1[k] * l1) + static_cast<int>(b2[k] * l2) + static_cast<int>(i1[j - k] * scl);
+        }
 
-  const int scl = 2048;
-
-  a[0] = ((int)b1[0] * l1) + ((int)b2[0] * l2) + ((int)i1[0] * scl);
-  a[1] = ((int)b1[1] * l1) + ((int)b2[1] * l2) + ((int)b2[0] * i1[0]) +
-         ((int)i1[1] * scl);
-  a[2] = ((int)b1[2] * l1) + ((int)b2[2] * l2) + ((int)b2[1] * i1[0]) +
-         ((int)b2[0] * i1[1]) + ((int)i1[2] * scl);
-  a[3] = ((int)b1[3] * l1) + ((int)b2[3] * l2) + ((int)b2[2] * i1[0]) +
-         ((int)b2[1] * i1[1]) + ((int)b2[0] * i1[2]) + ((int)i1[3] * scl);
-  a[4] = ((int)b1[4] * l1) + ((int)b2[4] * l2) + ((int)b2[3] * i1[0]) +
-         ((int)b2[2] * i1[1]) + ((int)b2[1] * i1[2]) + ((int)b2[0] * i1[3]) +
-         ((int)i1[4] * scl);
-  a[5] = ((int)b1[5] * l1) + ((int)b2[5] * l2) + ((int)b2[4] * i1[0]) +
-         ((int)b2[3] * i1[1]) + ((int)b2[2] * i1[2]) + ((int)b2[1] * i1[3]) +
-         ((int)b2[0] * i1[4]) + ((int)i1[5] * scl);
-  a[6] = ((int)b1[6] * l1) + ((int)b2[6] * l2) + ((int)b2[5] * i1[0]) +
-         ((int)b2[4] * i1[1]) + ((int)b2[3] * i1[2]) + ((int)b2[2] * i1[3]) +
-         ((int)b2[1] * i1[4]) + ((int)b2[0] * i1[5]) + ((int)i1[6] * scl);
-  a[7] = ((int)b1[7] * l1) + ((int)b2[7] * l2) + ((int)b2[6] * i1[0]) +
-         ((int)b2[5] * i1[1]) + ((int)b2[4] * i1[2]) + ((int)b2[3] * i1[3]) +
-         ((int)b2[2] * i1[4]) + ((int)b2[1] * i1[5]) + ((int)b2[0] * i1[6]) +
-         ((int)i1[7] * scl);
-
-  for (u32 j = 0; j < 8; j++) {
-    s16 r = Saturate<s16>(a[j ^ 1] >> 11);
-    a[j ^ 1] = r;
-    out[j] = r; // XXXX endian issues
-  }
+        s16 r = Saturate<s16>(a[j ^ 1] >> 11);
+        a[j ^ 1] = r;
+        out[j] = r; // XXXX endian issues
+    }
 }
 void ADPCM2(AudioHLECommand command) {
 

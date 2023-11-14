@@ -8,7 +8,7 @@
 #include <set>
 #include <map>
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 #include <strings.h>
 
 

@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef CORE_CPU_H_
 #define CORE_CPU_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <stdalign.h>
 #include "Core/Memory.h"
 #include "Core/R4300Instruction.h"

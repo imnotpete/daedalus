@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef GRAPHICS_PNGUTIL_H_
 #define GRAPHICS_PNGUTIL_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "Graphics/TextureFormat.h"
 

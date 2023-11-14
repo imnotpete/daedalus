@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef SYSPSP_DYNAREC_N64REGISTERCACHEPSP_H_
 #define SYSPSP_DYNAREC_N64REGISTERCACHEPSP_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "SysPSP/DynaRec/DynarecTargetPSP.h"
 

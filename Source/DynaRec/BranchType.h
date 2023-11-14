@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define DYNAREC_BRANCHTYPE_H_
 
 #include "Base/Types.h"
-#include <stdlib.h>
+#include <cstdlib>
 
 struct OpCode;
 

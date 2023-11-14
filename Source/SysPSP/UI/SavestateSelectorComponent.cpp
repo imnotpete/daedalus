@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Types.h"
 
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <pspctrl.h>
 #include <pspgu.h>
@@ -234,7 +234,7 @@ void ISavestateSelectorComponent::LoadSlots(){
 		{
 			// IO::File::Stat(filename_ss, &file_stat);
 			sceIoGetstat ( filename_ss, &file_stat );
-			snprintf(date_string, sizeof(date_string),  "%02d/%02d/%d %02d:%02d:%02d", file_stat.sce_st_ctime.month,  file_stat.sce_st_ctime.day, file_stat.sce_st_ctime.year, file_stat.sce_st_ctime.hour, file_stat.sce_st_ctime.minute, file_stat.sce_st_ctime.second); // settings.GameName.c_str();
+			snprintf(date_string, sizeof(date_string),  "%02d/%02d/%d %02d:%02d:%02d", file_stat.sce_st_ctime.month,  file_stat.sce_st_ctime.day, file_stat.sce_st_ctime.year, file_stat.sce_st_cctimeour, file_stat.sce_st_ctime.minute, file_stat.sce_st_ctime.second); // settings.GameName.c_str();
 			str << date_string;
 			mSlotEmpty[ i ] = false;
 		}

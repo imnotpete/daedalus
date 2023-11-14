@@ -23,8 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef DAEDALUS_DEBUG_CONSOLE
 
 #include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #include "Debug/DebugConsoleImpl.h"
 #include "Test/BatchTest.h"

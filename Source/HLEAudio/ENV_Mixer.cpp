@@ -1,13 +1,14 @@
 #include "Base/Types.h"
 
 
-#include <string.h>
+#include <cstring>
 
 #include "Base/MathUtil.h"
 #include "Core/Memory.h"
 #include "Debug/DBGConsole.h"
 #include "HLEAudio/HLEAudioInternal.h"
 #include "HLEAudio/HLEAudioState.h"
+#include "Ultra/ultra_abi.h"
 
 extern bool isMKABI;
 extern bool isZeldaABI;

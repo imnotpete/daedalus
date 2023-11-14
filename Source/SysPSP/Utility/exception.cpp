@@ -2,8 +2,8 @@
 #include "Base/Types.h"
 
 #include <unistd.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #include <pspgu.h>
 #include <pspkernel.h>

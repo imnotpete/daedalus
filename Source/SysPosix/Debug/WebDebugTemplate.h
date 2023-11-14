@@ -1,7 +1,7 @@
 #ifndef SYSPOSIX_DEBUG_WEBDEBUGTEMPLATE_H_
 #define SYSPOSIX_DEBUG_WEBDEBUGTEMPLATE_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 
 class WebDebugConnection;
 

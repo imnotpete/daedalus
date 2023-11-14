@@ -21,6 +21,7 @@ list(APPEND plat_main )
 		add_definitions("-g")
 		add_compile_options("-Wall")
 	else()
+	# set(CMAKE_BUILD_TYPE release)
 		add_compile_definitions(DAEDALUS_CONFIG_VERSION="Release") ## Perhaps we can remove this. It's only used in the PSP UI and model doesn't matter as much
 		add_compile_definitions("O3")
 		add_compile_definitions("flto")

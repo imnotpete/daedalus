@@ -3,7 +3,7 @@
 #include "SysGL/Interface/UI.h"
 
 #include <SDL2/SDL.h>
-#include <stdio.h>
+#include <cstdio>
 #include <filesystem>
 #include <iostream> 
 #include <sstream>

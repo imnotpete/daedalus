@@ -4,8 +4,9 @@
 #include "System/Mutex.h"
 
 #include <pthread.h>
-#include <stdlib.h>
-#include <sys/time.h>
+#include <cstdlib>
+#include <ctime>
+#include <chrono> 
 
 const double kTimeoutInfinity = 0.f;
 
@@ -28,21 +29,25 @@ void CondDestroy(Cond * cond)
 	// pthread_cond_destroy( (pthread_cond_t *)cond );
 	free( cond );
 }
-
-static void ComputeWait(double timeout, timespec * wait)
+void ComputeWait(double timeout, timespec* wait)
 {
-	timeval currenttime;
-	gettimeofday( &currenttime, NULL );
-	long dt_sec  = (long)timeout;
-	long dt_usec = (long)((timeout - (double)dt_sec) * 1000000.0);
+    auto current_time_point = std::chrono::system_clock::now();
+    auto duration_sec = std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::microseconds(static_cast<long long>(timeout * 1000000.0))
+    );
 
-	wait->tv_nsec = (currenttime.tv_usec + dt_usec) * 1000L;
-	if (wait->tv_nsec > 1000000000L)
-	{
-		wait->tv_nsec -= 1000000000L;
-		dt_sec++;
-	}
-	wait->tv_sec = currenttime.tv_sec + dt_sec;
+    auto new_time_point = current_time_point + duration_sec;
+
+    auto seconds_since_epoch = std::chrono::duration_cast<std::chrono::seconds>(
+        new_time_point.time_since_epoch()
+    );
+
+    auto remaining_nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        new_time_point - std::chrono::time_point_cast<std::chrono::seconds>(new_time_point)
+    );
+
+    wait->tv_sec = seconds_since_epoch.count();
+    wait->tv_nsec = remaining_nanoseconds.count();
 }
 
 void CondWait(Cond * cond, Mutex * mutex, double timeout)

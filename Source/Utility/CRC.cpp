@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Types.h"
 #include "Utility/CRC.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifdef CALC_CRC_TABLE
 static u32 crc_table[256];

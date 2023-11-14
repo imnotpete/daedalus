@@ -9,10 +9,10 @@
  *
  * $Id:
  */
-#include <stdlib.h>
+#include <cstdlib>
 #include <malloc.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #define DAEDALUS_PSP_GPROF
 

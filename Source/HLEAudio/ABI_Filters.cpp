@@ -1,7 +1,7 @@
 #include "Base/Types.h"
 
 
-#include <string.h>
+#include <cstring>
 #include <algorithm>
 
 #include "Base/MathUtil.h"

@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef DAEDALUS_PSP
 #include <pspfpu.h>
-#include <limits.h>
+#include <climits>
 
 #define SIM_DOUBLES
 #else

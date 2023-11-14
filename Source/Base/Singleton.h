@@ -23,7 +23,7 @@
 #ifndef UTILITY_SINGLETON_H_
 #define UTILITY_SINGLETON_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <memory>
 
 #include "Base/Assert.h"

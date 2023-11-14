@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef SYSPSP_GRAPHICS_DRAWTEXT_H_
 #define SYSPSP_GRAPHICS_DRAWTEXT_H_
 
-#include <string.h>
+#include <cstring>
 
 #include <vector>
 

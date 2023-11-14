@@ -3,7 +3,7 @@
 
 #include "Base/Types.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <pspge.h>
 
 #include "SysPSP/Utility/VolatileMem.h"

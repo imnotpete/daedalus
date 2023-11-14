@@ -12,7 +12,7 @@ homepage: http://wordpress.fx-world.org
 #include "Utility/FastMemcpy.h"
 #include "Base/Types.h"
 
-#include <string.h>
+#include <cstring>
 
 
 // Avoid using VFPU in our audio plugin, otherwise the ME will choke

@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_DLPARSER_H_
 #define HLEGRAPHICS_DLPARSER_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "Base/Types.h"
 

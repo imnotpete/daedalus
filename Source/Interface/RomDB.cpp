@@ -22,7 +22,7 @@
 #include "Base/Types.h"
 
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 #include <vector>
 
 #include "Core/ROM.h"

@@ -23,31 +23,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Types.h"
 
+
 //
 //	N.B. This source code is derived from Azimer's Audio plugin (v0.55?)
 //	and modified by StrmnNrmn to work with Daedalus PSP. Thanks Azimer!
 //	Drop me a line if you get chance :)
 //
 
-/* Audio commands: ABI 1 */
-/*
-#define	A_SPNOOP				0
-#define	A_ADPCM					1
-#define	A_CLEARBUFF				2
-#define	A_ENVMIXER				3
-#define	A_LOADBUFF				4
-#define	A_RESAMPLE				5
-#define A_SAVEBUFF				6
-#define A_SEGMENT				7
-#define A_SETBUFF				8
-#define A_SETVOL				9
-#define A_DMEMMOVE              10
-#define A_LOADADPCM             11
-#define A_MIXER					12
-#define A_INTERLEAVE            13
-#define A_POLEF                 14
-#define A_SETLOOP               15
-*/
 #define ACMD_SIZE 32
 //#define BUF_SIZE                16	//Normal 16bit
 //#define ADR_SIZE                24	//Normal 24bit
@@ -59,22 +41,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
   23;                                                                          \
   u32:                                                                         \
   1 // This will force RDRAM address to 0 -> 0x7FFFFF (8MB) //Corn
-/*
- * Audio flags
- */
-
-#define A_INIT 0x01
-#define A_CONTINUE 0x00
-#define A_LOOP 0x02
-#define A_OUT 0x02
-#define A_LEFT 0x02
-#define A_RIGHT 0x00
-#define A_VOL 0x04
-#define A_RATE 0x00
-#define A_AUX 0x08
-#define A_NOAUX 0x00
-#define A_MAIN 0x00
-#define A_MIX 0x10
 
 //------------------------------------------------------------------------------------------
 

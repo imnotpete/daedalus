@@ -32,8 +32,8 @@
 
 #include "Base/Types.h"
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #include "Core/Memory.h"
 #include "Core/RDRam.h"

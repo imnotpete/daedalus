@@ -1,7 +1,7 @@
 
 #include "Base/Types.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "Core/Memory.h"
 

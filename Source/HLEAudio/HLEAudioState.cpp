@@ -24,10 +24,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //	Drop me a line if you get chance :)
 //
 
-#include <string.h>
+#include <cstring>
 
 #include "Base/Types.h"
-
+#include "Ultra/ultra_abi.h"
 
 #include "Base/MathUtil.h"
 #include "HLEAudio/HLEAudioInternal.h"
@@ -48,8 +48,8 @@ void UNKNOWN(AudioHLECommand command) {}
 AudioHLEState gAudioHLEState;
 
 void AudioHLEState::ClearBuffer(u16 addr, u16 count) {
-  // XXXX check endianness
-  memset(Buffer + (addr & 0xfffc), 0, (count + 3) & 0xfffc);
+
+std::fill(std::begin(Buffer) + (addr & 0xfffc), std::begin(Buffer) + ((addr + count + 3) & 0xfffc), 0);
 }
 
 void AudioHLEState::EnvMixer(u8 flags, u32 address) {
@@ -444,7 +444,6 @@ inline void AudioHLEState::ExtractSamples(s32 *output, u32 inPtr) const {
 //
 //	l1/l2 are IN/OUT
 //
-#if 1 // 1->fast, 0->original Azimer //Corn
 inline void DecodeSamples(s16 *out, s32 &l1, s32 &l2, const s32 *input,
                           const s16 *book1, const s16 *book2) {
   // s32 a[8];
@@ -520,95 +519,18 @@ inline void DecodeSamples(s16 *out, s32 &l1, s32 &l2, const s32 *input,
   *out++ = l1 = Saturate<s16>(a[6] >> 11);
 }
 
-#else
-inline void DecodeSamples(s16 *out, s32 &l1, s32 &l2, const s32 *input,
-                          const s16 *book1, const s16 *book2) {
-  s32 a[8];
-
-  a[0] = (s32)book1[0] * l1;
-  a[0] += (s32)book2[0] * l2;
-  a[0] += input[0] * 2048;
-
-  a[1] = (s32)book1[1] * l1;
-  a[1] += (s32)book2[1] * l2;
-  a[1] += (s32)book2[0] * input[0];
-  a[1] += input[1] * 2048;
-
-  a[2] = (s32)book1[2] * l1;
-  a[2] += (s32)book2[2] * l2;
-  a[2] += (s32)book2[1] * input[0];
-  a[2] += (s32)book2[0] * input[1];
-  a[2] += input[2] * 2048;
-
-  a[3] = (s32)book1[3] * l1;
-  a[3] += (s32)book2[3] * l2;
-  a[3] += (s32)book2[2] * input[0];
-  a[3] += (s32)book2[1] * input[1];
-  a[3] += (s32)book2[0] * input[2];
-  a[3] += input[3] * 2048;
-
-  a[4] = (s32)book1[4] * l1;
-  a[4] += (s32)book2[4] * l2;
-  a[4] += (s32)book2[3] * input[0];
-  a[4] += (s32)book2[2] * input[1];
-  a[4] += (s32)book2[1] * input[2];
-  a[4] += (s32)book2[0] * input[3];
-  a[4] += input[4] * 2048;
-
-  a[5] = (s32)book1[5] * l1;
-  a[5] += (s32)book2[5] * l2;
-  a[5] += (s32)book2[4] * input[0];
-  a[5] += (s32)book2[3] * input[1];
-  a[5] += (s32)book2[2] * input[2];
-  a[5] += (s32)book2[1] * input[3];
-  a[5] += (s32)book2[0] * input[4];
-  a[5] += input[5] * 2048;
-
-  a[6] = (s32)book1[6] * l1;
-  a[6] += (s32)book2[6] * l2;
-  a[6] += (s32)book2[5] * input[0];
-  a[6] += (s32)book2[4] * input[1];
-  a[6] += (s32)book2[3] * input[2];
-  a[6] += (s32)book2[2] * input[3];
-  a[6] += (s32)book2[1] * input[4];
-  a[6] += (s32)book2[0] * input[5];
-  a[6] += input[6] * 2048;
-
-  a[7] = (s32)book1[7] * l1;
-  a[7] += (s32)book2[7] * l2;
-  a[7] += (s32)book2[6] * input[0];
-  a[7] += (s32)book2[5] * input[1];
-  a[7] += (s32)book2[4] * input[2];
-  a[7] += (s32)book2[3] * input[3];
-  a[7] += (s32)book2[2] * input[4];
-  a[7] += (s32)book2[1] * input[5];
-  a[7] += (s32)book2[0] * input[6];
-  a[7] += input[7] * 2048;
-
-  s16 r[8];
-  for (u32 j = 0; j < 8; j++) {
-    u32 idx(j ^ 1);
-    r[idx] = Saturate<s16>(a[idx] >> 11);
-    *(out++) = r[idx];
-  }
-
-  l1 = r[6];
-  l2 = r[7];
-}
-#endif
-
 void AudioHLEState::ADPCMDecode(u8 flags, u32 address) {
   bool init = (flags & 0x1) != 0;
   bool loop = (flags & 0x2) != 0;
 
   u16 inPtr = 0;
-  s16 *out = (s16 *)(Buffer + OutBuffer);
+  s16 *out = reinterpret_cast<s16*>(Buffer + OutBuffer);
 
   if (init) {
-    memset(out, 0, 32);
+    std::fill(out, out + 32, 0);
   } else {
-    u32 addr(loop ? LoopVal : address);
-    memmove(out, &rdram[addr], 32);
+    u32 addr = loop ? LoopVal : address;
+    std::memcpy(out, &rdram[addr], 32);
   }
 
   s32 l1 = out[15];
@@ -618,32 +540,18 @@ void AudioHLEState::ADPCMDecode(u8 flags, u32 address) {
   s32 inp1[8];
   s32 inp2[8];
 
-  // std::array<s32, 8> inp1;
-  //   std::array<s32, 8> inp2;
-  s32 count = (s16)Count; // XXXX why convert this to signed?
+  s32 count = static_cast<s32>(Count);
   while (count > 0) {
-    // the first iteration through, these values are
-    // either 0 in the case of A_INIT, from a special
-    // area of memory in the case of A_LOOP or just
-    // the values we calculated the last time
-
     u8 code = Buffer[(InBuffer + inPtr) ^ 3];
-    u32 index = code & 0xf; // index into the adpcm code table
-    s16 *book1 = (s16 *)&ADPCMTable[index << 4];
+    u32 index = code & 0xf;
+    s16 *book1 = reinterpret_cast<s16*>(&ADPCMTable[index << 4]);
     s16 *book2 = book1 + 8;
-    code >>= 4; // upper nibble is scale
+    code >>= 4;
 
-    inPtr++; // coded adpcm data lies next
+    inPtr++;
 
     if (code < 12) {
-      s32 vscale =
-          (0x8000 >> ((12 - code) -
-                      1)); // very strange. 0x8000 would be .5 in 16:16 format
-                           // so this appears to be a fractional scale based
-                           // on the 12 based inverse of the scale value.  note
-                           // that this could be negative, in which case we do
-                           // not use the calculated vscale value... see the
-                           // if(code>12) check below
+      s32 vscale = (0x8000 >> ((12 - code) - 1));
       ExtractSamplesScale(inp1, inPtr + 0, vscale);
       ExtractSamplesScale(inp2, inPtr + 4, vscale);
     } else {
@@ -659,8 +567,9 @@ void AudioHLEState::ADPCMDecode(u8 flags, u32 address) {
     count -= 32;
   }
   out -= 16;
-  memmove(&rdram[address], out, 32);
+  std::memcpy(&rdram[address], out, 32);
 }
+
 
 void AudioHLEState::LoadBuffer(u32 address) {
   LoadBuffer(InBuffer, address, Count);
@@ -669,20 +578,27 @@ void AudioHLEState::LoadBuffer(u32 address) {
 void AudioHLEState::SaveBuffer(u32 address) {
   SaveBuffer(address, OutBuffer, Count);
 }
-
 void AudioHLEState::LoadBuffer(u16 dram_dst, u32 ram_src, u16 count) {
   if (count > 0) {
-    // XXXX Masks look suspicious - trying to get around endian issues?
-    memmove(Buffer + (dram_dst & 0xFFFC), rdram + (ram_src & 0xfffffc),
-            (count + 3) & 0xFFFC);
+    // Ensure alignment to 4 bytes
+    u16 aligned_dram_dst = dram_dst & 0xFFFC;
+    u32 aligned_ram_src = ram_src & 0xFFFFFC;
+    u16 aligned_count = (count + 3) & 0xFFFC;
+
+    // Perform the copy
+    std::memcpy(Buffer + aligned_dram_dst, rdram + aligned_ram_src, aligned_count);
   }
 }
 
 void AudioHLEState::SaveBuffer(u32 ram_dst, u16 dmem_src, u16 count) {
   if (count > 0) {
-    // XXXX Masks look suspicious - trying to get around endian issues?
-    memmove(rdram + (ram_dst & 0xfffffc), Buffer + (dmem_src & 0xFFFC),
-            (count + 3) & 0xFFFC);
+    // Ensure alignment to 4 bytes
+    u32 aligned_ram_dst = ram_dst & 0xFFFFFC;
+    u16 aligned_dmem_src = dmem_src & 0xFFFC;
+    u16 aligned_count = (count + 3) & 0xFFFC;
+
+    // Perform the copy
+    std::memcpy(rdram + aligned_ram_dst, Buffer + aligned_dmem_src, aligned_count);
   }
 }
 /*
@@ -749,45 +665,34 @@ void AudioHLEState::LoadADPCM(u32 address, u16 count) {
 }
 
 void AudioHLEState::Interleave(u16 outaddr, u16 laddr, u16 raddr, u16 count) {
-  u32 *out = (u32 *)(Buffer + outaddr); // Save some bandwith also corrected
-                                        // left and right//Corn
-  const u16 *inr = (const u16 *)(Buffer + raddr);
-  const u16 *inl = (const u16 *)(Buffer + laddr);
+  u32* out = reinterpret_cast<u32*>(Buffer + outaddr);
+  const u16* inr = reinterpret_cast<const u16*>(Buffer + raddr);
+  const u16* inl = reinterpret_cast<const u16*>(Buffer + laddr);
 
-  for (u32 x = (count >> 2); x != 0; x--) {
+  for (u16 x = 0; x < (count / 4); ++x) {
     const u16 right = *inr++;
     const u16 left = *inl++;
 
-    *out++ = (*inr++ << 16) | *inl++;
-    *out++ = (right << 16) | left;
+    *out++ = (static_cast<u32>(*inr++) << 16) | *inl++;
+    *out++ = (static_cast<u32>(right) << 16) | left;
   }
 }
+
 
 void AudioHLEState::Interleave(u16 laddr, u16 raddr) {
   Interleave(OutBuffer, laddr, raddr, Count);
 }
 
 void AudioHLEState::Mixer(u16 dmemout, u16 dmemin, s32 gain, u16 count) {
-#if 1 // 1->fast, 0->safe/slow //Corn
 
-  // Make sure we are on even address (YOSHI)
-  s16 *in = (s16 *)(Buffer + dmemin);
-  s16 *out = (s16 *)(Buffer + dmemout);
+// Make sure we are on an even address (YOSHI)
+s16* in = reinterpret_cast<s16*>(Buffer + dmemin);
+s16* out = reinterpret_cast<s16*>(Buffer + dmemout);
 
-  for (u32 x = count >> 1; x != 0; x--) {
-    *out = Saturate<s16>(FixedPointMul15(*in++, gain) + s32(*out));
-    out++;
-  }
+for (u32 x = count >> 1; x != 0; --x) {
+    *out++ = Saturate<s16>(FixedPointMul15(*in++, gain) + static_cast<s32>(*out));
+}
 
-#else
-  for (u32 x = 0; x < count; x += 2) {
-    s16 in(*(s16 *)(Buffer + (dmemin + x)));
-    s16 out(*(s16 *)(Buffer + (dmemout + x)));
-
-    *(s16 *)(Buffer + ((dmemout + x) & (N64_AUDIO_BUFF - 2))) =
-        Saturate<s16>(FixedPointMul15(in, gain) + s32(out));
-  }
-#endif
 }
 
 void AudioHLEState::Deinterleave(u16 outaddr, u16 inaddr, u16 count) {

@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef UTILITY_ROMFILEUNCOMPRESSED_H_
 #define UTILITY_ROMFILEUNCOMPRESSED_H_
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "RomFile/RomFile.h"
 
