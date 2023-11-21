@@ -7,6 +7,22 @@ on:
     types: [run_build]
 
 jobs:
+  build-ctr:
+    name: 3DS Build
+    runs-on: ubuntu-latest
+    container: wally4000/daedalusx64:latest
+  
+    steps:
+      - uses: actions/checkout@v2
+  
+      - name: Install dependencies
+        run: |
+          apk add build-base git bash cmake
+      
+      - name: Compile project
+        run: |
+          ./build_daedalus.sh CTR
+  
   build-psp:
     name: PSP Build
     runs-on: ubuntu-latest
