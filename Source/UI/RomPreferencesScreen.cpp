@@ -198,8 +198,6 @@ namespace
 }
 
 
-//
-
 class IRomPreferencesScreen : public CRomPreferencesScreen, public CUIScreen
 {
 	public:
@@ -231,14 +229,8 @@ class IRomPreferencesScreen : public CRomPreferencesScreen, public CUIScreen
 };
 
 
-//
+CRomPreferencesScreen::~CRomPreferencesScreen() {}
 
-CRomPreferencesScreen::~CRomPreferencesScreen()
-{
-}
-
-
-//
 
 CRomPreferencesScreen *	CRomPreferencesScreen::Create( CUIContext * p_context, const RomID & rom_id )
 {
@@ -277,12 +269,9 @@ IRomPreferencesScreen::IRomPreferencesScreen( CUIContext * p_context, const RomI
 }
 
 
-//
 
 IRomPreferencesScreen::~IRomPreferencesScreen() {}
 
-
-//
 
 void	IRomPreferencesScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
 {
@@ -317,20 +306,19 @@ void	IRomPreferencesScreen::Update( float elapsed_time, const v2 & stick, u32 ol
 }
 
 
-//
-
 void	IRomPreferencesScreen::Render()
 {
 	mpContext->ClearBackground();
 
-	u32		font_height( mpContext->GetFontHeight() );
-	u32		line_height( font_height + 2 );
-	s32		y;
+	u32		font_height = mpContext->GetFontHeight();
+	u32		line_height = font_height + 2;
 
 	const char * const title_text = "Rom Preferences";
 	mpContext->SetFontStyle( CUIContext::FS_HEADING );
-	u32		heading_height( mpContext->GetFontHeight() );
-	y = MENU_TOP + heading_height;
+
+	u32	heading_height = mpContext->GetFontHeight();
+	s32 y = MENU_TOP + heading_height;
+
 	mpContext->DrawTextAlign( LIST_TEXT_LEFT, LIST_TEXT_WIDTH, AT_CENTRE, y, title_text, mpContext->GetDefaultTextColour() ); y += heading_height;
 	mpContext->SetFontStyle( CUIContext::FS_REGULAR );
 
@@ -342,7 +330,7 @@ void	IRomPreferencesScreen::Render()
 
 	mElements.Draw( mpContext, LIST_TEXT_LEFT, LIST_TEXT_WIDTH, AT_CENTRE, y );
 
-	CUIElement *	element( mElements.GetSelectedElement() );
+	auto element = mElements.GetSelectedElement();
 	if( element != NULL )
 	{
 		const char *		p_description( element->GetDescription() );
@@ -358,15 +346,10 @@ void	IRomPreferencesScreen::Render()
 }
 
 
-//
-
 void	IRomPreferencesScreen::Run()
 {
 	CUIScreen::Run();
 }
-
-
-//
 
 void	IRomPreferencesScreen::OnConfirm()
 {
@@ -379,8 +362,6 @@ void	IRomPreferencesScreen::OnConfirm()
 	mIsFinished = true;
 }
 
-
-//
 
 void	IRomPreferencesScreen::OnCancel()
 {

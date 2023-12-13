@@ -170,15 +170,15 @@ namespace
 
 		virtual	void			OnSelected()
 		{
-			CAdjustDeadzoneScreen *	adjust_deadzone( CAdjustDeadzoneScreen::Create( mpContext ) );
+			CAdjustDeadzoneScreen *	adjust_deadzone =  CAdjustDeadzoneScreen::Create( mpContext );
 			adjust_deadzone->Run();
 			delete adjust_deadzone;
 		}
 
 		virtual const char *	GetSettingName() const
 		{
-			f32 min_deadzone( gGlobalPreferences.StickMinDeadzone );
-			f32 max_deadzone( gGlobalPreferences.StickMaxDeadzone );
+			f32 min_deadzone = gGlobalPreferences.StickMinDeadzone;
+			f32 max_deadzone = gGlobalPreferences.StickMaxDeadzone;
 
 			static char buffer[ 10+10+1 ];
 			snprintf( buffer, sizeof(buffer), "%d/%d", s32( 100.0f * min_deadzone ), s32( 100.0f * max_deadzone ) );
@@ -188,7 +188,8 @@ namespace
 	private:
 		CUIContext *			mpContext;
 	};
-
+	
+// Not too sure we should be doing file management within the UI
 	class CResetSetting : public CUISetting
 	{
 	public:

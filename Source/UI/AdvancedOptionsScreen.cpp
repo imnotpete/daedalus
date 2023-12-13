@@ -143,14 +143,13 @@ void	IAdvancedOptionsScreen::Render()
 {
 	mpContext->ClearBackground();
 
-	s16		font_height( mpContext->GetFontHeight() );
-	s16		line_height( font_height + 2 );
-	s16		y;
+	s16		font_height =  mpContext->GetFontHeight();
+	s16		line_height =  font_height + 2;
 
 	const char * const title_text = "Advanced Options";
 	mpContext->SetFontStyle( CUIContext::FS_HEADING );
-	s16		heading_height( mpContext->GetFontHeight() );
-	y = MENU_TOP + heading_height;
+	s16		heading_height =  mpContext->GetFontHeight();
+	s16 y = MENU_TOP + heading_height;
 	mpContext->DrawTextAlign( LIST_TEXT_LEFT, LIST_TEXT_WIDTH, AT_CENTRE, y, title_text, mpContext->GetDefaultTextColour() ); y += heading_height;
 	mpContext->SetFontStyle( CUIContext::FS_REGULAR );
 

@@ -120,7 +120,7 @@ IPauseScreen::IPauseScreen( CUIContext * p_context )
 ,	mIsFinished( false )
 ,	mCurrentOption( MO_PAUSE_OPTIONS )
 {
-	for( u32 i = 0; i < NUM_MENU_OPTIONS; ++i )
+	for( auto i = 0; i < NUM_MENU_OPTIONS; ++i )
 	{
 		mOptionComponents[ i ] = NULL;
 	}
@@ -139,7 +139,7 @@ IPauseScreen::IPauseScreen( CUIContext * p_context )
 
 IPauseScreen::~IPauseScreen()
 {
-	for( u32 i = 0; i < NUM_MENU_OPTIONS; ++i )
+	for( auto i = 0; i < NUM_MENU_OPTIONS; ++i )
 	{
 		delete mOptionComponents[ i ];
 	}
@@ -148,8 +148,8 @@ IPauseScreen::~IPauseScreen()
 
 EMenuOption		IPauseScreen::GetPreviousValidOption() const
 {
-	bool			looped( false );
-	EMenuOption		current_option( mCurrentOption );
+	bool			looped =  false;
+	EMenuOption		current_option =  mCurrentOption;
 
 	do
 	{
@@ -164,8 +164,8 @@ EMenuOption		IPauseScreen::GetPreviousValidOption() const
 
 EMenuOption		IPauseScreen::GetNextValidOption() const
 {
-	bool			looped( false );
-	EMenuOption		current_option( mCurrentOption );
+	bool			looped =  false;
+	EMenuOption		current_option = mCurrentOption;
 
 	do
 	{
@@ -221,9 +221,9 @@ void	IPauseScreen::Render()
 {
 	mpContext->ClearBackground();
 
-	s32			y( MENU_TOP );
+	s32			y =  MENU_TOP;
 
-	const char * p_option_text;
+	const char * p_option_text = nullptr;
 
 	c32		valid_colour( mpContext->GetDefaultTextColour() );
 	c32		invalid_colour( 200, 200, 200 );

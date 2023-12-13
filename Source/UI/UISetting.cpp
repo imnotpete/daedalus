@@ -37,7 +37,7 @@ u32		CUISetting::GetHeight( CUIContext * context ) const
 
 void	CUISetting::Draw( CUIContext * context, s32 min_x, s32 max_x, EAlignType halign, s32 y, bool selected ) const
 {
-	bool		read_only( IsReadOnly() );
+	bool		read_only =  IsReadOnly();
 
 	c32	colour;
 	if( selected )
@@ -57,6 +57,6 @@ void	CUISetting::Draw( CUIContext * context, s32 min_x, s32 max_x, EAlignType ha
 	context->DrawText( min_x, y, mName, colour );
 
 	// And the current setting on the right
-	const char * setting_name( GetSettingName() );
+	const char * setting_name = GetSettingName();
 	context->DrawTextAlign( min_x, max_x, AT_RIGHT, y, setting_name, colour );
 }

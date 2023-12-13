@@ -34,9 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "UISetting.h"
 #include "UICommand.h"
 #include "UISpacer.h"
-
-//
-
 class ISelectedRomComponent : public CSelectedRomComponent
 {
 	public:
@@ -64,31 +61,19 @@ class ISelectedRomComponent : public CSelectedRomComponent
 		RomID						mRomID;
 };
 
-
-//
-
 CSelectedRomComponent::CSelectedRomComponent( CUIContext * p_context )
 :	CUIComponent( p_context )
 {
 }
 
-
-//
-
 CSelectedRomComponent::~CSelectedRomComponent()
 {
 }
-
-
-//
 
 CSelectedRomComponent *	CSelectedRomComponent::Create( CUIContext * p_context, CFunctor * on_start_emulation )
 {
 	return new ISelectedRomComponent( p_context, on_start_emulation );
 }
-
-
-//
 
 ISelectedRomComponent::ISelectedRomComponent( CUIContext * p_context, CFunctor * on_start_emulation )
 :	CSelectedRomComponent( p_context )
@@ -144,17 +129,15 @@ void	ISelectedRomComponent::Update( float elapsed_time, const v2 & stick, u32 ol
 	}
 }
 
-
-//
-
 void	ISelectedRomComponent::Render()
 {
 	mElements.Draw( mpContext, LIST_TEXT_LEFT, LIST_TEXT_WIDTH, AT_CENTRE, BELOW_MENU_MIN );
 
-	CUIElement *	element( mElements.GetSelectedElement() );
+	auto element = mElements.GetSelectedElement()
+	;
 	if( element != NULL )
 	{
-		const char *		p_description( element->GetDescription() );
+		const char *		p_description =  element->GetDescription();
 
 		mpContext->DrawTextArea( DESCRIPTION_AREA_LEFT,
 								 DESCRIPTION_AREA_TOP,
@@ -168,7 +151,7 @@ void	ISelectedRomComponent::Render()
 
 void	ISelectedRomComponent::EditPreferences()
 {
-	CRomPreferencesScreen *	edit_preferences( CRomPreferencesScreen::Create( mpContext, mRomID ) );
+	auto edit_preferences =  CRomPreferencesScreen::Create( mpContext, mRomID );
 	edit_preferences->Run();
 	delete edit_preferences;
 }
@@ -176,14 +159,14 @@ void	ISelectedRomComponent::EditPreferences()
 
 void	ISelectedRomComponent::AdvancedOptions()
 {
-	CAdvancedOptionsScreen *	advanced_options( CAdvancedOptionsScreen::Create( mpContext, mRomID ) );
+	auto advanced_options =  CAdvancedOptionsScreen::Create( mpContext, mRomID );
 	advanced_options->Run();
 	delete advanced_options;
 }
 
 void	ISelectedRomComponent::CheatOptions()
 {
-	CCheatOptionsScreen *	cheat_options( CCheatOptionsScreen::Create( mpContext, mRomID ) );
+	auto cheat_options = CCheatOptionsScreen::Create( mpContext, mRomID );
 	cheat_options->Run();
 	delete cheat_options;
 }

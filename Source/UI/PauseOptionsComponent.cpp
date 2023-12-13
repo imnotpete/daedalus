@@ -178,10 +178,10 @@ void	IPauseOptionsComponent::Render()
 
 	mElements.Draw( mpContext, LIST_TEXT_LEFT, LIST_TEXT_WIDTH, AT_CENTRE, BELOW_MENU_MIN );
 
-	CUIElement *	element( mElements.GetSelectedElement() );
+	auto element  = mElements.GetSelectedElement();
 	if( element != NULL )
 	{
-		const char *		p_description( element->GetDescription() );
+		const char *		p_description =  element->GetDescription();
 
 		mpContext->DrawTextArea( DESCRIPTION_AREA_LEFT,
 								 DESCRIPTION_AREA_TOP,
@@ -214,7 +214,7 @@ void IPauseOptionsComponent::OnReset()
 
 void	IPauseOptionsComponent::EditPreferences()
 {
-	CRomPreferencesScreen *	edit_preferences( CRomPreferencesScreen::Create( mpContext, g_ROM.mRomID ) );
+	auto	edit_preferences =  CRomPreferencesScreen::Create( mpContext, g_ROM.mRomID );
 	edit_preferences->Run();
 	delete edit_preferences;
 }
@@ -222,14 +222,14 @@ void	IPauseOptionsComponent::EditPreferences()
 
 void	IPauseOptionsComponent::AdvancedOptions()
 {
-	CAdvancedOptionsScreen *	advanced_options( CAdvancedOptionsScreen::Create( mpContext, g_ROM.mRomID ) );
+	auto advanced_options = CAdvancedOptionsScreen::Create( mpContext, g_ROM.mRomID );
 	advanced_options->Run();
 	delete advanced_options;
 }
 
 void	IPauseOptionsComponent::CheatOptions()
 {
-	CCheatOptionsScreen *	cheat_options( CCheatOptionsScreen::Create( mpContext, g_ROM.mRomID ) );
+	auto cheat_options = CCheatOptionsScreen::Create( mpContext, g_ROM.mRomID );
 	cheat_options->Run();
 	delete cheat_options;
 }
@@ -237,9 +237,8 @@ void	IPauseOptionsComponent::CheatOptions()
 
 void	IPauseOptionsComponent::SaveState()
 {
-	CSavestateSelectorComponent *	component( CSavestateSelectorComponent::Create( mpContext, CSavestateSelectorComponent::AT_SAVING, new CMemberFunctor1< IPauseOptionsComponent, const char * >( this, &IPauseOptionsComponent::OnSaveStateSlotSelected ), g_ROM.settings.GameName.c_str() ) );
-
-	CUIComponentScreen *			screen( CUIComponentScreen::Create( mpContext, component, SAVING_TITLE_TEXT ) );
+	auto component = CSavestateSelectorComponent::Create( mpContext, CSavestateSelectorComponent::AT_SAVING, new CMemberFunctor1< IPauseOptionsComponent, const char * >( this, &IPauseOptionsComponent::OnSaveStateSlotSelected ), g_ROM.settings.GameName.c_str() );
+	auto screen =  CUIComponentScreen::Create( mpContext, component, SAVING_TITLE_TEXT );
 	screen->Run();
 	delete screen;
 	(*mOnResume)();
@@ -248,8 +247,8 @@ void	IPauseOptionsComponent::SaveState()
 
 void	IPauseOptionsComponent::LoadState()
 {
-	CSavestateSelectorComponent *	component( CSavestateSelectorComponent::Create( mpContext, CSavestateSelectorComponent::AT_LOADING, new CMemberFunctor1< IPauseOptionsComponent, const char * >( this, &IPauseOptionsComponent::OnLoadStateSlotSelected ), g_ROM.settings.GameName.c_str() ) );
-	CUIComponentScreen *			screen( CUIComponentScreen::Create( mpContext, component, LOADING_TITLE_TEXT ) );
+	auto component = CSavestateSelectorComponent::Create( mpContext, CSavestateSelectorComponent::AT_LOADING, new CMemberFunctor1< IPauseOptionsComponent, const char * >( this, &IPauseOptionsComponent::OnLoadStateSlotSelected ), g_ROM.settings.GameName.c_str() );
+	auto screen = CUIComponentScreen::Create( mpContext, component, LOADING_TITLE_TEXT );
 	screen->Run();
 	delete screen;
 	(*mOnResume)();

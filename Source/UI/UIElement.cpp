@@ -32,9 +32,9 @@ CUIElementBag::CUIElementBag()
 
 CUIElementBag::~CUIElementBag()
 {
-	for( u32 i = 0; i < mElements.size(); ++i )
+	for( auto& element : mElements )
 	{
-		delete mElements[ i ];
+		delete element;
 	}
 }
 
@@ -44,35 +44,33 @@ void CUIElementBag::Draw( CUIContext * context, s32 min_x, s32 max_x, EAlignType
 	const s32 MINTOP = 25; //Only draw text below
 	const s32 MAXBOT = 247;	//Only draw text above
 
-	for( u32 i = 0; i < mElements.size(); ++i )
-	{
-		const CUIElement *	element( mElements[ i ] );
+for (const auto& element : mElements) 
+{
+    if (y > MINTOP && y < MAXBOT) {
+        element->Draw(context, min_x, max_x, halign, y, &element == &mElements[mSelectedIdx]);
+    }
+    y += element->GetHeight(context);
+}
 
-		if (y > MINTOP && y < MAXBOT ) element->Draw( context, min_x, max_x, halign, y, i == mSelectedIdx );
-		y += element->GetHeight( context );
-	}
 }
 
 
 void	CUIElementBag::DrawCentredVertically( CUIContext * context, s32 min_x, s32 min_y, s32 max_x, s32 max_y ) const
 {
-	s32 total_height( 0 );
+	s32 total_height = 0;
 
-	for( u32 i = 0; i < mElements.size(); ++i )
+for (const auto& element : mElements) 
+{
+    total_height += element->GetHeight(context);
+}
+	
+
+	s32		slack =  (max_y - min_y) - total_height;
+	s32		y =  min_y + (slack / 2) ;
+
+	for( auto& element : mElements)
 	{
-		const CUIElement *	element( mElements[ i ] );
-
-		total_height += element->GetHeight( context );
-	}
-
-	s32		slack( (max_y - min_y) - total_height );
-	s32		y( min_y + (slack / 2) );
-
-	for( u32 i = 0; i < mElements.size(); ++i )
-	{
-		const CUIElement *	element( mElements[ i ] );
-
-		element->Draw( context, min_x, max_x, AT_CENTRE, y, i == mSelectedIdx );
+		element->Draw( context, min_x, max_x, AT_CENTRE, y, &element == &mElements[mSelectedIdx] );
 		y += element->GetHeight( context );
 	}
 

@@ -56,7 +56,7 @@ namespace
 		MO_SAVESTATES,
 		MO_ABOUT,
 	};
-	const s16 NUM_MENU_OPTIONS {MO_ABOUT+1};
+	const s16 NUM_MENU_OPTIONS = MO_ABOUT + 1;
 
 	const EMenuOption	MO_FIRST_OPTION = MO_GLOBAL_SETTINGS;
 	const EMenuOption	MO_LAST_OPTION = MO_ABOUT;
@@ -131,7 +131,7 @@ IMainMenuScreen::IMainMenuScreen( CUIContext * p_context )
 ,	mCurrentOption( MO_ROMS )
 ,	mCurrentDisplayOption( mCurrentOption )
 {
-	for( u32 i {0}; i < NUM_MENU_OPTIONS; ++i )
+	for( auto i = 0; i < NUM_MENU_OPTIONS; ++i )
 	{
 		mOptionComponents[ i ] = nullptr;
 	}
@@ -148,7 +148,7 @@ IMainMenuScreen::IMainMenuScreen( CUIContext * p_context )
 
 IMainMenuScreen::~IMainMenuScreen()
 {
-	for( u32 i = 0; i < NUM_MENU_OPTIONS; ++i )
+	for( auto i = 0; i < NUM_MENU_OPTIONS; ++i )
 	{
 		delete mOptionComponents[ i ];
 	}
@@ -156,7 +156,7 @@ IMainMenuScreen::~IMainMenuScreen()
 
 EMenuOption	IMainMenuScreen::AsMenuOption( s32 option )
 {
-	s32 m( option % s32(NUM_MENU_OPTIONS) );
+	s32 m =  option % s32(NUM_MENU_OPTIONS);
 	if( m < 0 )
 		m += NUM_MENU_OPTIONS;
 
@@ -169,9 +169,9 @@ EMenuOption	IMainMenuScreen::AsMenuOption( s32 option )
 
 s32	IMainMenuScreen::GetPreviousValidOption() const
 {
-	bool		looped( false );
-	s32			current_option( mCurrentOption );
-	EMenuOption	initial_option( AsMenuOption( current_option ) );
+	bool		looped  = false;
+	s32			current_option = mCurrentOption;
+	EMenuOption	initial_option = AsMenuOption( current_option );
 
 	do
 	{
@@ -183,14 +183,11 @@ s32	IMainMenuScreen::GetPreviousValidOption() const
 	return current_option;
 }
 
-
-//
-
 s32	IMainMenuScreen::GetNextValidOption() const
 {
-	bool			looped( false );
-	s32			current_option( mCurrentOption );
-	EMenuOption	initial_option( AsMenuOption( current_option ) );
+	bool			looped =  false;
+	s32			current_option =  mCurrentOption;
+	EMenuOption	initial_option = AsMenuOption( current_option );
 
 	do
 	{
@@ -249,12 +246,11 @@ void	IMainMenuScreen::Render()
 {
 	mpContext->ClearBackground();
 
-
 	c32		valid_colour( mpContext->GetDefaultTextColour() );
 	c32		invalid_colour( 200, 200, 200 );
 
-	f32		min_scale( 0.60f );
-	f32		max_scale( 1.0f );
+	f32		min_scale =  0.60f;
+	f32		max_scale = 1.0f ;
 
 	s32		SCREEN_LEFT = 20;
 	s32		SCREEN_RIGHT = SCREEN_WIDTH - 20;
@@ -263,22 +259,22 @@ void	IMainMenuScreen::Render()
 
 	s32		y( MENU_TOP + mpContext->GetFontHeight() );
 
-	for( s32 i = -2; i <= 2; ++i )
+	for( auto i = -2; i <= 2; ++i )
 	{
-		EMenuOption		option( AsMenuOption( mCurrentOption + i ) );
+		EMenuOption		option = AsMenuOption( mCurrentOption + i );
 		c32				text_col( IsOptionValid( option ) ? valid_colour : invalid_colour );
-		const char *	option_text( gMenuOptionNames[ option ] );
-		u32				text_width( mpContext->GetTextWidth( option_text ) );
+		const char *	option_text =  gMenuOptionNames[ option ];
+		u32				text_width =  mpContext->GetTextWidth( option_text );
 
-		f32				diff( f32( mCurrentOption + i ) - mCurrentDisplayOption );
-		f32				dist( fabsf( diff ) );
+		f32				diff =  f32( mCurrentOption + i ) - mCurrentDisplayOption;
+		f32				dist = fabsf( diff );
 
-		s32				centre( ( SCREEN_WIDTH - text_width ) / 2 );
-		s32				extreme( diff < 0 ? SCREEN_LEFT : s32( SCREEN_RIGHT - (text_width * min_scale) ) );
+		s32				centre = ( SCREEN_WIDTH - text_width ) / 2;
+		s32				extreme = diff < 0 ? SCREEN_LEFT : s32( SCREEN_RIGHT - (text_width * min_scale) );
 
 		// Interpolate between central and extreme position and centre
-		f32				scale( max_scale + (min_scale - max_scale) * dist );
-		s32				x( s32( centre + (extreme - centre) * dist ) );
+		f32				scale = max_scale + (min_scale - max_scale) * dist;
+		s32				x =  s32( centre + (extreme - centre) * dist );
 
 		mpContext->DrawTextScale( x, y, scale, option_text, text_col );
 	}
@@ -288,8 +284,6 @@ void	IMainMenuScreen::Render()
 	mOptionComponents[ GetCurrentOption() ]->Render();
 }
 
-
-//
 
 void	IMainMenuScreen::Run()
 {
@@ -303,8 +297,6 @@ void	IMainMenuScreen::Run()
 	CGraphicsContext::Get()->ClearAllSurfaces();
 }
 
-
-//
 
 void	IMainMenuScreen::OnRomSelected( const char * rom_filename )
 {
@@ -364,8 +356,6 @@ void	IMainMenuScreen::OnSavestateSelected( const char * savestate_filename )
 }
 
 
-//
-
 void	IMainMenuScreen::OnStartEmulation()
 {
 	System_Open(mRomFilename.c_str());
@@ -378,7 +368,7 @@ void DisplayRomsAndChoose(bool show_splash)
 	// switch back to the LCD display
 	CGraphicsContext::Get()->SwitchToLcdDisplay();
 
-	CUIContext *	p_context( CUIContext::Create() );
+	auto p_context =  CUIContext::Create();
 
 	if(p_context != NULL)
 	{
@@ -386,12 +376,12 @@ void DisplayRomsAndChoose(bool show_splash)
 
 		if( show_splash )
 		{
-			CSplashScreen *		p_splash( CSplashScreen::Create( p_context ) );
+			auto p_splash = CSplashScreen::Create( p_context );
 			p_splash->Run();
 			delete p_splash;
 		}
 
-		CMainMenuScreen *	p_main_menu( CMainMenuScreen::Create( p_context ) );
+		auto p_main_menu = CMainMenuScreen::Create( p_context );
 		p_main_menu->Run();
 		delete p_main_menu;
 	}
