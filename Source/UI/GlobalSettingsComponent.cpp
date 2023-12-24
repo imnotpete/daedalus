@@ -23,6 +23,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 
+extern u32 HAVE_DVE;
+extern u32 PSP_TV_CABLE;
+extern bool PSP_IS_SLIM;
+
 
 CGlobalSettingsComponent::~CGlobalSettingsComponent() {}
 
