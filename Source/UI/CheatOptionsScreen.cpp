@@ -20,50 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Types.h"
 
 #include "CheatOptionsScreen.h"
-#include "PSPMenu.h"
-#include "UIContext.h"
-#include "UIScreen.h"
-#include "UISetting.h"
-#include "UISpacer.h"
-#include "UICommand.h"
 
-#include "Config/ConfigOptions.h"
-#include "Core/Cheats.h"
-#include "Core/ROM.h"
-#include "Core/RomSettings.h"
-#include "Graphics/ColourValue.h"
-#include "Input/InputManager.h"
-#include "DrawTextUtilities.h"
-#include "System/IO.h"
-#include "Interface/Preferences.h"
-#include "Utility/Stream.h"
-
-
-
-class ICheatOptionsScreen : public CCheatOptionsScreen, public CUIScreen
-{
-	public:
-
-		ICheatOptionsScreen( CUIContext * p_context, const RomID & rom_id );
-		~ICheatOptionsScreen();
-
-		// CCheatOptionsScreen
-		virtual void				Run();
-
-		// CUIScreen
-		virtual void				Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons );
-		virtual void				Render();
-		virtual bool				IsFinished() const									{ return mIsFinished; }
-
-	private:
-		void				OnConfirm();
-		void				OnCancel();
-		RomID						mRomID;
-		std::string					mRomName;
-		SRomPreferences				mRomPreferences;
-		bool						mIsFinished;
-		CUIElementBag				mElements;
-};
 
 //
 
@@ -136,11 +93,11 @@ CCheatOptionsScreen::~CCheatOptionsScreen() {}
 
 CCheatOptionsScreen *	CCheatOptionsScreen::Create( CUIContext * p_context, const RomID & rom_id )
 {
-	return new ICheatOptionsScreen( p_context, rom_id );
+	return new CCheatOptionsScreen( p_context, rom_id );
 }
 
 
-ICheatOptionsScreen::ICheatOptionsScreen( CUIContext * p_context, const RomID & rom_id )
+CCheatOptionsScreen::CCheatOptionsScreen( CUIContext * p_context, const RomID & rom_id )
 :	CUIScreen( p_context )
 ,	mRomID( rom_id )
 ,	mRomName( "?" )
@@ -185,22 +142,15 @@ ICheatOptionsScreen::ICheatOptionsScreen( CUIContext * p_context, const RomID & 
 	}
 
 
-	mElements.Add( new CUICommandImpl( new CMemberFunctor< ICheatOptionsScreen >( this, &ICheatOptionsScreen::OnConfirm ), "Save & Return", "Confirm changes to settings and return." ) );
-	mElements.Add( new CUICommandImpl( new CMemberFunctor< ICheatOptionsScreen >( this, &ICheatOptionsScreen::OnCancel ), "Cancel", "Cancel changes to settings and return." ) );
+	mElements.Add( new CUICommandImpl( new CMemberFunctor< CCheatOptionsScreen >( this, &CCheatOptionsScreen::OnConfirm ), "Save & Return", "Confirm changes to settings and return." ) );
+	mElements.Add( new CUICommandImpl( new CMemberFunctor< CCheatOptionsScreen >( this, &CCheatOptionsScreen::OnCancel ), "Cancel", "Cancel changes to settings and return." ) );
 
 }
 
 
 //
 
-ICheatOptionsScreen::~ICheatOptionsScreen()
-{
-}
-
-
-//
-
-void	ICheatOptionsScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
+void	CCheatOptionsScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
 {
 	if(old_buttons != new_buttons)
 	{
@@ -235,7 +185,7 @@ void	ICheatOptionsScreen::Update( float elapsed_time, const v2 & stick, u32 old_
 
 //
 
-void	ICheatOptionsScreen::Render()
+void	CCheatOptionsScreen::Render()
 {
 	mpContext->ClearBackground();
 
@@ -279,16 +229,13 @@ void	ICheatOptionsScreen::Render()
 
 //
 
-void	ICheatOptionsScreen::Run()
+void	CCheatOptionsScreen::Run()
 {
 	CUIScreen::Run();
 }
 
 
-
-//
-
-void	ICheatOptionsScreen::OnConfirm()
+void	CCheatOptionsScreen::OnConfirm()
 {
 	CPreferences::Get()->SetRomPreferences( mRomID, mRomPreferences );
 
@@ -300,9 +247,7 @@ void	ICheatOptionsScreen::OnConfirm()
 }
 
 
-//
-
-void	ICheatOptionsScreen::OnCancel()
+void	CCheatOptionsScreen::OnCancel()
 {
 	mIsFinished = true;
 }

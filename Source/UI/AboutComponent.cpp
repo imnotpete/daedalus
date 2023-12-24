@@ -36,58 +36,33 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string>
 
-class IAboutComponent : public CAboutComponent
-{
-	public:
-
-		IAboutComponent( CUIContext * p_context );
-		~IAboutComponent();
-
-		// CUIComponent
-		virtual void				Update( f32 elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons );
-		virtual void				Render();
-
-	private:
-		std::shared_ptr<CNativeTexture>		mpTexture;
-};
-
 
 CAboutComponent::CAboutComponent( CUIContext * p_context )
 :	CUIComponent( p_context )
- {}
-
+, 	mpTexture( CNativeTexture::CreateFromPng( LOGO_FILENAME, TexFmt_8888 ) )
+{}
 
 CAboutComponent::~CAboutComponent() {}
 
-
-CAboutComponent *	CAboutComponent::Create( CUIContext * p_context )
+CAboutComponent* CAboutComponent::Create(CUIContext* p_context)
 {
-	return new IAboutComponent( p_context );
+    return new CAboutComponent(p_context);
 }
 
-IAboutComponent::IAboutComponent( CUIContext * p_context )
-:	CAboutComponent( p_context )
-,	mpTexture( CNativeTexture::CreateFromPng( LOGO_FILENAME, TexFmt_8888 ) )
-{}
+void	CAboutComponent::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons ) {}
 
 
-IAboutComponent::~IAboutComponent() {}
-
-void	IAboutComponent::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons ) {}
-
-
-void	IAboutComponent::Render()
+void	CAboutComponent::Render()
 {
-
 		s16 text_top = 38;
 
-	if(mpTexture != nullptr)
+	if(mpTexture != NULL)
 	{
-		s16		w = mpTexture->GetWidth();
-		s16		h = mpTexture->GetHeight();
+		s16	w = mpTexture->GetWidth();
+		s16	h = mpTexture->GetHeight();
 
-		f32		desired_height = 60.0f;
-		f32		scale = desired_height / f32( h );
+		f32	desired_height = 60.0f;
+		f32	scale = desired_height / f32( h );
 
 		v2		wh( f32( w ) * scale, f32( h ) * scale );
 		v2		tl( f32( (SCREEN_WIDTH - wh.x)/2 ), f32( text_top ) );
@@ -97,14 +72,14 @@ void	IAboutComponent::Render()
 		text_top += u32( wh.y + 10.0f );
 	}
 
-	const s16	line_height =  mpContext->GetFontHeight() + 2;
+	const s16	line_height = mpContext->GetFontHeight() + 2;
 
 	s16 y = text_top;
 
 	std::string	version = DAEDALUS_VERSION_TEXT + DAEDALUS_CONFIG_VERSION;
 
 
-std::string	date = DATE_TEXT + __DATE__;
+	std::string	date = DATE_TEXT + __DATE__;
 	mpContext->DrawTextAlign( LIST_TEXT_LEFT, LIST_TEXT_WIDTH, AT_CENTRE, y, version.data(), DrawTextUtilities::TextWhite ); y += line_height;
 	mpContext->DrawTextAlign( LIST_TEXT_LEFT, LIST_TEXT_WIDTH, AT_CENTRE, y, date.data(), DrawTextUtilities::TextWhite ); y += line_height;
 

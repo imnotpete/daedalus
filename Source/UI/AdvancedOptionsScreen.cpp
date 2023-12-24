@@ -21,61 +21,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Types.h"
 #include "AdvancedOptionsScreen.h"
 
-#include "PSPMenu.h"
-#include "UIContext.h"
-#include "UIScreen.h"
-#include "UISetting.h"
-#include "UISpacer.h"
-#include "UICommand.h"
-
-#include "Config/ConfigOptions.h"
-#include "Core/ROM.h"
-#include "Core/RomSettings.h"
-#include "Graphics/ColourValue.h"
-#include "Input/InputManager.h"
-#include "DrawTextUtilities.h"
-#include "Interface/Preferences.h"
-
-
-
-class IAdvancedOptionsScreen : public CAdvancedOptionsScreen, public CUIScreen
-{
-	public:
-
-		IAdvancedOptionsScreen( CUIContext * p_context, const RomID & rom_id );
-		~IAdvancedOptionsScreen();
-
-		// CAdvancedOptionsScreen
-		virtual void				Run();
-
-		// CUIScreen
-		virtual void				Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons );
-		virtual void				Render();
-		virtual bool				IsFinished() const									{ return mIsFinished; }
-
-	private:
-				void				OnConfirm();
-				void				OnCancel();
-
-	private:
-		RomID						mRomID;
-		std::string					mRomName;
-		SRomPreferences				mRomPreferences;
-
-		bool						mIsFinished;
-
-		CUIElementBag				mElements;
-};
 
 CAdvancedOptionsScreen::~CAdvancedOptionsScreen() {}
 
 CAdvancedOptionsScreen *	CAdvancedOptionsScreen::Create( CUIContext * p_context, const RomID & rom_id )
 {
-	return new IAdvancedOptionsScreen( p_context, rom_id );
+	return new CAdvancedOptionsScreen( p_context, rom_id );
 }
 
 
-IAdvancedOptionsScreen::IAdvancedOptionsScreen( CUIContext * p_context, const RomID & rom_id )
+CAdvancedOptionsScreen::CAdvancedOptionsScreen( CUIContext * p_context, const RomID & rom_id )
 :	CUIScreen( p_context )
 ,	mRomID( rom_id )
 ,	mRomName( "?" )
@@ -98,16 +53,13 @@ IAdvancedOptionsScreen::IAdvancedOptionsScreen( CUIContext * p_context, const Ro
 	mElements.Add( new CBoolSetting( &mRomPreferences.VideoRateMatch, "Video Rate Match", "Match video rate to the frame rate (makes some games less sluggish Rayman2/Donald Duck/Tom and Jerry/Earth Worm Jim)", "Yes", "No" ) );
 	mElements.Add( new CBoolSetting( &mRomPreferences.AudioRateMatch, "Audio Rate Match", "Match audio rate to the frame rate (less pops and clicks)", "Yes", "No" ) );
 	mElements.Add( new CBoolSetting( &mRomPreferences.FogEnabled, "Fog Emulation", "Enable or disable distance fog (works on many ROMs but the extra rendering pass uses more resources)", "Enabled", "Disabled" ) );
-	mElements.Add( new CUICommandImpl( new CMemberFunctor< IAdvancedOptionsScreen >( this, &IAdvancedOptionsScreen::OnConfirm ), "Save & Return", "Confirm changes to settings and return." ) );
-	mElements.Add( new CUICommandImpl( new CMemberFunctor< IAdvancedOptionsScreen >( this, &IAdvancedOptionsScreen::OnCancel ), "Cancel", "Cancel changes to settings and return." ) );
+	mElements.Add( new CUICommandImpl( new CMemberFunctor< CAdvancedOptionsScreen >( this, &CAdvancedOptionsScreen::OnConfirm ), "Save & Return", "Confirm changes to settings and return." ) );
+	mElements.Add( new CUICommandImpl( new CMemberFunctor< CAdvancedOptionsScreen >( this, &CAdvancedOptionsScreen::OnCancel ), "Cancel", "Cancel changes to settings and return." ) );
 
 }
 
 
-IAdvancedOptionsScreen::~IAdvancedOptionsScreen() {}
-
-
-void	IAdvancedOptionsScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
+void	CAdvancedOptionsScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
 {
 	if(old_buttons != new_buttons)
 	{
@@ -139,7 +91,7 @@ void	IAdvancedOptionsScreen::Update( float elapsed_time, const v2 & stick, u32 o
 	}
 }
 
-void	IAdvancedOptionsScreen::Render()
+void	CAdvancedOptionsScreen::Render()
 {
 	mpContext->ClearBackground();
 
@@ -177,13 +129,13 @@ void	IAdvancedOptionsScreen::Render()
 }
 
 
-void	IAdvancedOptionsScreen::Run()
+void	CAdvancedOptionsScreen::Run()
 {
 	CUIScreen::Run();
 }
 
 
-void	IAdvancedOptionsScreen::OnConfirm()
+void	CAdvancedOptionsScreen::OnConfirm()
 {
 	CPreferences::Get()->SetRomPreferences( mRomID, mRomPreferences );
 	CPreferences::Get()->Commit();
@@ -191,7 +143,7 @@ void	IAdvancedOptionsScreen::OnConfirm()
 	mIsFinished = true;
 }
 
-void	IAdvancedOptionsScreen::OnCancel()
+void	CAdvancedOptionsScreen::OnCancel()
 {
 	mIsFinished = true;
 }

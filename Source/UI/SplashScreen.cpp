@@ -20,52 +20,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Types.h"
 
-#include "Graphics/ColourValue.h"
-#include "Graphics/GraphicsContext.h"
-#include "Graphics/NativeTexture.h"
-#include "Math/Math.h"	// VFPU Math
-#include "DrawTextUtilities.h"
-#include "PSPMenu.h"
 #include "SplashScreen.h"
-#include "UIContext.h"
-#include "UIScreen.h"
-
-#include "Interface/Preferences.h"
-
 extern bool g32bitColorMode;
-
-class ISplashScreen : public CSplashScreen, public CUIScreen
-{
-	public:
-
-		ISplashScreen( CUIContext * p_context );
-		~ISplashScreen();
-
-		// CSplashScreen
-		virtual void				Run();
-
-		// CUIScreen
-		virtual void				Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons );
-		virtual void				Render();
-		virtual bool				IsFinished() const									{ return mIsFinished; }
-
-	private:
-		bool						mIsFinished;
-		float						mElapsedTime;
-		std::shared_ptr<CNativeTexture>		mpTexture;
-};
-
-
-CSplashScreen::~CSplashScreen() {}
 
 
 CSplashScreen *	CSplashScreen::Create( CUIContext * p_context )
 {
-	return new ISplashScreen( p_context );
+	return new CSplashScreen( p_context );
 }
 
 
-ISplashScreen::ISplashScreen( CUIContext * p_context )
+CSplashScreen::CSplashScreen( CUIContext * p_context )
 :	CUIScreen( p_context )
 ,	mIsFinished( false )
 ,	mElapsedTime( 0.0f )
@@ -73,10 +38,10 @@ ISplashScreen::ISplashScreen( CUIContext * p_context )
 {}
 
 
-ISplashScreen::~ISplashScreen() {}
+CSplashScreen::~CSplashScreen() {}
 
 
-void	ISplashScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
+void	CSplashScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
 {
 	// If any button was unpressed and is now pressed, exit
 	if((~old_buttons) & new_buttons)
@@ -91,7 +56,7 @@ void	ISplashScreen::Update( float elapsed_time, const v2 & stick, u32 old_button
 	}
 }
 
-void	ISplashScreen::Render()
+void	CSplashScreen::Render()
 {
 	f32	alpha =  255.0f * sinf( mElapsedTime * PI / MAX_TIME );
 	u8		a = 0;
@@ -110,7 +75,7 @@ void	ISplashScreen::Render()
 #endif
 }
 
-void	ISplashScreen::Run()
+void	CSplashScreen::Run()
 {
 	CUIScreen::Run();
 }

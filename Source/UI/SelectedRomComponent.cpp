@@ -20,84 +20,38 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Types.h"
 
-#include "Core/ROM.h"
-#include "Graphics/ColourValue.h"
-#include "Input/InputManager.h"
-#include "DrawTextUtilities.h"
-#include "AdvancedOptionsScreen.h"
-#include "CheatOptionsScreen.h"
-#include "PSPMenu.h"
-#include "RomPreferencesScreen.h"
 #include "SelectedRomComponent.h"
-#include "UIContext.h"
-#include "UIScreen.h"
-#include "UISetting.h"
-#include "UICommand.h"
-#include "UISpacer.h"
-class ISelectedRomComponent : public CSelectedRomComponent
-{
-	public:
 
-		ISelectedRomComponent( CUIContext * p_context, CFunctor * on_start_emulation );
-		~ISelectedRomComponent();
 
-		// CUIComponent
-		virtual void				Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons );
-		virtual void				Render();
-
-		virtual void				SetRomID( const RomID & rom_id )			{ mRomID = rom_id; }
-
-	private:
-		void						EditPreferences();
-		void						AdvancedOptions();
-		void						CheatOptions();
-		void						StartEmulation();
-
-	private:
-		CFunctor *					OnStartEmulation;
-
-		CUIElementBag				mElements;
-
-		RomID						mRomID;
-};
-
-CSelectedRomComponent::CSelectedRomComponent( CUIContext * p_context )
-:	CUIComponent( p_context )
-{
-}
-
-CSelectedRomComponent::~CSelectedRomComponent()
-{
-}
 
 CSelectedRomComponent *	CSelectedRomComponent::Create( CUIContext * p_context, CFunctor * on_start_emulation )
 {
-	return new ISelectedRomComponent( p_context, on_start_emulation );
+	return new CSelectedRomComponent( p_context, on_start_emulation );
 }
 
-ISelectedRomComponent::ISelectedRomComponent( CUIContext * p_context, CFunctor * on_start_emulation )
-:	CSelectedRomComponent( p_context )
+CSelectedRomComponent::CSelectedRomComponent( CUIContext * p_context, CFunctor * on_start_emulation )
+:	CUIComponent( p_context )
 ,	OnStartEmulation( on_start_emulation )
 {
-	mElements.Add( new CUICommandImpl( new CMemberFunctor< ISelectedRomComponent >( this, &ISelectedRomComponent::EditPreferences ), "Edit Preferences", "Edit various preferences for this rom." ) );
-	mElements.Add( new CUICommandImpl( new CMemberFunctor< ISelectedRomComponent >( this, &ISelectedRomComponent::AdvancedOptions ), "Advanced Options", "Edit advanced options for this rom." ) );
-	mElements.Add( new CUICommandImpl( new CMemberFunctor< ISelectedRomComponent >( this, &ISelectedRomComponent::CheatOptions ), "Cheats", "Enable and select cheats for this rom." ) );
+	mElements.Add( new CUICommandImpl( new CMemberFunctor< CSelectedRomComponent >( this, &CSelectedRomComponent::EditPreferences ), "Edit Preferences", "Edit various preferences for this rom." ) );
+	mElements.Add( new CUICommandImpl( new CMemberFunctor< CSelectedRomComponent >( this, &CSelectedRomComponent::AdvancedOptions ), "Advanced Options", "Edit advanced options for this rom." ) );
+	mElements.Add( new CUICommandImpl( new CMemberFunctor< CSelectedRomComponent >( this, &CSelectedRomComponent::CheatOptions ), "Cheats", "Enable and select cheats for this rom." ) );
 
 	mElements.Add( new CUISpacer( 16 ) );
 
-	u32 i = mElements.Add( new CUICommandImpl( new CMemberFunctor< ISelectedRomComponent >( this, &ISelectedRomComponent::StartEmulation ), "Start Emulation", "Start emulating the selected rom." ) );
+	u32 i = mElements.Add( new CUICommandImpl( new CMemberFunctor< CSelectedRomComponent >( this, &CSelectedRomComponent::StartEmulation ), "Start Emulation", "Start emulating the selected rom." ) );
 
 	mElements.SetSelected( i );
 }
 
 
-ISelectedRomComponent::~ISelectedRomComponent()
+CSelectedRomComponent::~CSelectedRomComponent()
 {
 	delete OnStartEmulation;
 }
 
 
-void	ISelectedRomComponent::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
+void	CSelectedRomComponent::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
 {
 	if(old_buttons != new_buttons)
 	{
@@ -129,7 +83,7 @@ void	ISelectedRomComponent::Update( float elapsed_time, const v2 & stick, u32 ol
 	}
 }
 
-void	ISelectedRomComponent::Render()
+void	CSelectedRomComponent::Render()
 {
 	mElements.Draw( mpContext, LIST_TEXT_LEFT, LIST_TEXT_WIDTH, AT_CENTRE, BELOW_MENU_MIN );
 
@@ -149,7 +103,7 @@ void	ISelectedRomComponent::Render()
 	}
 }
 
-void	ISelectedRomComponent::EditPreferences()
+void	CSelectedRomComponent::EditPreferences()
 {
 	auto edit_preferences =  CRomPreferencesScreen::Create( mpContext, mRomID );
 	edit_preferences->Run();
@@ -157,14 +111,14 @@ void	ISelectedRomComponent::EditPreferences()
 }
 
 
-void	ISelectedRomComponent::AdvancedOptions()
+void	CSelectedRomComponent::AdvancedOptions()
 {
 	auto advanced_options =  CAdvancedOptionsScreen::Create( mpContext, mRomID );
 	advanced_options->Run();
 	delete advanced_options;
 }
 
-void	ISelectedRomComponent::CheatOptions()
+void	CSelectedRomComponent::CheatOptions()
 {
 	auto cheat_options = CCheatOptionsScreen::Create( mpContext, mRomID );
 	cheat_options->Run();
@@ -172,7 +126,7 @@ void	ISelectedRomComponent::CheatOptions()
 }
 
 
-void	ISelectedRomComponent::StartEmulation()
+void	CSelectedRomComponent::StartEmulation()
 {
 	if(OnStartEmulation != NULL)
 	{

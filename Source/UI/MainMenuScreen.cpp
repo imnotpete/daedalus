@@ -23,109 +23,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string>
 
-#include "Core/CPU.h"
-#include "Core/ROM.h"
-#include "Core/RomSettings.h"
-#include "Interface/SaveState.h"
-#include "Graphics/ColourValue.h"
-#include "Graphics/GraphicsContext.h"
-#include "Base/MathUtil.h"
-#include "DrawTextUtilities.h"
-#include "AboutComponent.h"
-#include "GlobalSettingsComponent.h"
 #include "MainMenuScreen.h"
-#include "PSPMenu.h"
-#include "RomSelectorComponent.h"
-#include "SelectedRomComponent.h"
-#include "SavestateSelectorComponent.h"
-#include "UIContext.h"
-#include "UIScreen.h"
-#include "SplashScreen.h"
-#include "System/SystemInit.h"
-#include "Interface/Preferences.h"
 
-
-namespace
-{
-
-	enum EMenuOption
-	{
-		MO_GLOBAL_SETTINGS = 0,
-		MO_ROMS,
-		MO_SELECTED_ROM,
-		MO_SAVESTATES,
-		MO_ABOUT,
-	};
-	const s16 NUM_MENU_OPTIONS = MO_ABOUT + 1;
-
-	const EMenuOption	MO_FIRST_OPTION = MO_GLOBAL_SETTINGS;
-	const EMenuOption	MO_LAST_OPTION = MO_ABOUT;
-
-	const char * const	gMenuOptionNames[ NUM_MENU_OPTIONS ] =
-	{
-		"Global Settings",
-		"Roms",
-		"Selected Rom",
-		"Savestates",
-		"About",
-	};
-}
-
-class IMainMenuScreen : public CMainMenuScreen, public CUIScreen
-{
-	public:
-
-		IMainMenuScreen( CUIContext * p_context );
-		~IMainMenuScreen();
-
-		// CMainMenuScreen
-		virtual void				Run();
-
-		// CUIScreen
-		virtual void				Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons );
-		virtual void				Render();
-		virtual bool				IsFinished() const									{ return mIsFinished; }
-
-
-	private:
-		static	EMenuOption			AsMenuOption( s32 option );
-
-				EMenuOption			GetPreviousOption() const							{ return AsMenuOption( mCurrentOption - 1 ); }
-				EMenuOption			GetCurrentOption() const							{ return AsMenuOption( mCurrentOption ); }
-				EMenuOption			GetNextOption() const								{ return AsMenuOption( mCurrentOption + 1 ); }
-
-				s32					GetPreviousValidOption() const;
-				s32					GetNextValidOption() const;
-
-				bool				IsOptionValid( EMenuOption option ) const;
-
-				void				OnRomSelected( const char * rom_filename );
-				void				OnSavestateSelected( const char * savestate_filename );
-				void				OnStartEmulation();
-
-	private:
-		bool						mIsFinished;
-
-		s32							mCurrentOption;
-		f32							mCurrentDisplayOption;
-
-		CUIComponent *				mOptionComponents[ NUM_MENU_OPTIONS ];
-		CSelectedRomComponent *		mSelectedRomComponent;
-
-		std::string					mRomFilename;
-		RomID						mRomID;
-};
-
-
-CMainMenuScreen::~CMainMenuScreen() {}
 
 CMainMenuScreen *	CMainMenuScreen::Create( CUIContext * p_context )
 {
-	return new IMainMenuScreen( p_context );
+	return new CMainMenuScreen( p_context );
 }
 
 
-IMainMenuScreen::IMainMenuScreen( CUIContext * p_context )
+CMainMenuScreen::CMainMenuScreen( CUIContext * p_context )
 :	CUIScreen( p_context )
 ,	mIsFinished( false )
 ,	mCurrentOption( MO_ROMS )
@@ -136,17 +43,17 @@ IMainMenuScreen::IMainMenuScreen( CUIContext * p_context )
 		mOptionComponents[ i ] = nullptr;
 	}
 
-	mSelectedRomComponent = CSelectedRomComponent::Create( mpContext, new CMemberFunctor< IMainMenuScreen >( this, &IMainMenuScreen::OnStartEmulation ) );
+	mSelectedRomComponent = CSelectedRomComponent::Create( mpContext, new CMemberFunctor< CMainMenuScreen >( this, &CMainMenuScreen::OnStartEmulation ) );
 
 	mOptionComponents[ MO_GLOBAL_SETTINGS ]	= CGlobalSettingsComponent::Create( mpContext );
-	mOptionComponents[ MO_ROMS ]			= CRomSelectorComponent::Create( mpContext, new CMemberFunctor1< IMainMenuScreen, const char * >( this, &IMainMenuScreen::OnRomSelected ) );
+	mOptionComponents[ MO_ROMS ]			= CRomSelectorComponent::Create( mpContext, new CMemberFunctor1< CMainMenuScreen, const char * >( this, &CMainMenuScreen::OnRomSelected ) );
 	mOptionComponents[ MO_SELECTED_ROM ]	= mSelectedRomComponent;
-	mOptionComponents[ MO_SAVESTATES ]		= CSavestateSelectorComponent::Create( mpContext, CSavestateSelectorComponent::AT_LOADING, new CMemberFunctor1< IMainMenuScreen, const char * >( this, &IMainMenuScreen::OnSavestateSelected ), 0 );
+	mOptionComponents[ MO_SAVESTATES ]		= CSavestateSelectorComponent::Create( mpContext, CSavestateSelectorComponent::AT_LOADING, new CMemberFunctor1< CMainMenuScreen, const char * >( this, &CMainMenuScreen::OnSavestateSelected ), 0 );
 	mOptionComponents[ MO_ABOUT ]			= CAboutComponent::Create( mpContext );
 
 }
 
-IMainMenuScreen::~IMainMenuScreen()
+CMainMenuScreen::~CMainMenuScreen()
 {
 	for( auto i = 0; i < NUM_MENU_OPTIONS; ++i )
 	{
@@ -154,7 +61,7 @@ IMainMenuScreen::~IMainMenuScreen()
 	}
 }
 
-EMenuOption	IMainMenuScreen::AsMenuOption( s32 option )
+EMenuOption	CMainMenuScreen::AsMenuOption( s32 option )
 {
 	s32 m =  option % s32(NUM_MENU_OPTIONS);
 	if( m < 0 )
@@ -167,7 +74,7 @@ EMenuOption	IMainMenuScreen::AsMenuOption( s32 option )
 }
 
 
-s32	IMainMenuScreen::GetPreviousValidOption() const
+s32	CMainMenuScreen::GetPreviousValidOption() const
 {
 	bool		looped  = false;
 	s32			current_option = mCurrentOption;
@@ -183,7 +90,7 @@ s32	IMainMenuScreen::GetPreviousValidOption() const
 	return current_option;
 }
 
-s32	IMainMenuScreen::GetNextValidOption() const
+s32	CMainMenuScreen::GetNextValidOption() const
 {
 	bool			looped =  false;
 	s32			current_option =  mCurrentOption;
@@ -202,7 +109,7 @@ s32	IMainMenuScreen::GetNextValidOption() const
 
 //
 
-bool	IMainMenuScreen::IsOptionValid( EMenuOption option ) const
+bool	CMainMenuScreen::IsOptionValid( EMenuOption option ) const
 {
 	// Rom Settings is only valid if a rom has already been selected
 	if( option == MO_SELECTED_ROM )
@@ -217,7 +124,7 @@ bool	IMainMenuScreen::IsOptionValid( EMenuOption option ) const
 
 //
 
-void	IMainMenuScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
+void	CMainMenuScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
 {
 	if(old_buttons != new_buttons)
 	{
@@ -242,7 +149,7 @@ void	IMainMenuScreen::Update( float elapsed_time, const v2 & stick, u32 old_butt
 
 //
 
-void	IMainMenuScreen::Render()
+void	CMainMenuScreen::Render()
 {
 	mpContext->ClearBackground();
 
@@ -285,7 +192,7 @@ void	IMainMenuScreen::Render()
 }
 
 
-void	IMainMenuScreen::Run()
+void	CMainMenuScreen::Run()
 {
 	mIsFinished = false;
 	CUIScreen::Run();
@@ -298,7 +205,7 @@ void	IMainMenuScreen::Run()
 }
 
 
-void	IMainMenuScreen::OnRomSelected( const char * rom_filename )
+void	CMainMenuScreen::OnRomSelected( const char * rom_filename )
 {
 	u32			rom_size;
 	ECicType	boot_type;
@@ -320,7 +227,7 @@ void	IMainMenuScreen::OnRomSelected( const char * rom_filename )
 
 // This feature is not really stable
 
-void	IMainMenuScreen::OnSavestateSelected( const char * savestate_filename )
+void	CMainMenuScreen::OnSavestateSelected( const char * savestate_filename )
 {
 	// If the CPU is running we need to queue a request to load the state
 	// (and possibly switch roms). Otherwise we just load the rom directly
@@ -356,7 +263,7 @@ void	IMainMenuScreen::OnSavestateSelected( const char * savestate_filename )
 }
 
 
-void	IMainMenuScreen::OnStartEmulation()
+void	CMainMenuScreen::OnStartEmulation()
 {
 	System_Open(mRomFilename.c_str());
 	mIsFinished = true;

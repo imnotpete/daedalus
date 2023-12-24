@@ -25,61 +25,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <algorithm>
 
 
-#include "UIContext.h"
-#include "UIScreen.h"
-
-#include "Input/InputManager.h"
-#include "Math/Math.h"	// VFPU Math
-#include "Base/MathUtil.h"
-#include "Math/Vector2.h"
-#include "DrawTextUtilities.h"
-#include "Interface/Preferences.h"
-#include "Utility/Translate.h"
-#include "PSPMenu.h"
-#include <algorithm>
-
-
-class IAdjustDeadzoneScreen : public CAdjustDeadzoneScreen, public CUIScreen
-{
-	public:
-
-		IAdjustDeadzoneScreen( CUIContext * p_context );
-		~IAdjustDeadzoneScreen();
-
-		virtual void				Run();
-		virtual void				Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons );
-		virtual void				Render();
-		virtual bool				IsFinished() const									{ return mIsFinished; }
-
-	private:
-		void						DrawCircle( s32 x, s32 y, s32 r, c32 colour );
-		void						DrawCrosshair( s32 x, s32 y, c32 colour );
-		void						DrawStick( s32 x, s32 y, s32 r, const v2 & stick, f32 min_deadzone, f32 max_deadzone );
-
-	private:
-		bool						mIsFinished;
-		v2							mPspStick;
-		v2							mN64Stick;
-		bool						mAdjustingMinDeadzone;
-		f32							mStickMinDeadzone;
-		f32							mStickMaxDeadzone;
-};
-
-
-CAdjustDeadzoneScreen::~CAdjustDeadzoneScreen() {}
-
-
-//
-
 CAdjustDeadzoneScreen *	CAdjustDeadzoneScreen::Create( CUIContext * p_context )
 {
-	return new IAdjustDeadzoneScreen( p_context );
+	return new CAdjustDeadzoneScreen ( p_context );
 }
 
-
-//
-
-IAdjustDeadzoneScreen::IAdjustDeadzoneScreen( CUIContext * p_context )
+CAdjustDeadzoneScreen::CAdjustDeadzoneScreen( CUIContext * p_context )
 :	CUIScreen( p_context )
 ,	mIsFinished( false )
 ,	mPspStick( 0.0f, 0.0f )
@@ -90,10 +41,10 @@ IAdjustDeadzoneScreen::IAdjustDeadzoneScreen( CUIContext * p_context )
 {
 }
 
-IAdjustDeadzoneScreen::~IAdjustDeadzoneScreen() {}
+CAdjustDeadzoneScreen::~CAdjustDeadzoneScreen() {}
 
 
-void	IAdjustDeadzoneScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
+void	CAdjustDeadzoneScreen::Update( float elapsed_time, const v2 & stick, u32 old_buttons, u32 new_buttons )
 {
 	if(new_buttons & PSP_CTRL_DOWN)
 	{
@@ -161,7 +112,7 @@ void	IAdjustDeadzoneScreen::Update( float elapsed_time, const v2 & stick, u32 ol
 }
 
 
-void	IAdjustDeadzoneScreen::DrawCircle( s32 x, s32 y, s32 r, c32 colour )
+void	CAdjustDeadzoneScreen::DrawCircle( s32 x, s32 y, s32 r, c32 colour )
 {
 	const u32 NUM_POINTS = 32;
 
@@ -182,7 +133,7 @@ void	IAdjustDeadzoneScreen::DrawCircle( s32 x, s32 y, s32 r, c32 colour )
 }
 
 
-void	IAdjustDeadzoneScreen::DrawCrosshair( s32 x, s32 y, c32 colour )
+void	CAdjustDeadzoneScreen::DrawCrosshair( s32 x, s32 y, c32 colour )
 {
 	mpContext->DrawLine( x - 4, y, x - 1, y, colour );
 	mpContext->DrawLine( x + 4, y, x + 1, y, colour );
@@ -191,7 +142,7 @@ void	IAdjustDeadzoneScreen::DrawCrosshair( s32 x, s32 y, c32 colour )
 }
 
 
-void	IAdjustDeadzoneScreen::DrawStick( s32 x, s32 y, s32 r, const v2 & stick, f32 min_deadzone, f32 max_deadzone )
+void	CAdjustDeadzoneScreen::DrawStick( s32 x, s32 y, s32 r, const v2 & stick, f32 min_deadzone, f32 max_deadzone )
 {
 	c32		white( 255, 255, 255 );
 	c32		red( 255, 0, 0 );
@@ -218,7 +169,7 @@ void	IAdjustDeadzoneScreen::DrawStick( s32 x, s32 y, s32 r, const v2 & stick, f3
 }
 
 
-void	IAdjustDeadzoneScreen::Render()
+void	CAdjustDeadzoneScreen::Render()
 {
 	mpContext->ClearBackground();
 
@@ -244,7 +195,7 @@ void	IAdjustDeadzoneScreen::Render()
 }
 
 
-void	IAdjustDeadzoneScreen::Run()
+void	CAdjustDeadzoneScreen::Run()
 {
 	CUIScreen::Run();
 }
